@@ -57,7 +57,8 @@ function App() {
 
   // useRouteReplay Hook
   const { state, controls } = useRouteReplay({
-    mapContainerRef: mapContainerRef, // Pass the ref directly
+    mapContainerRef:
+      mapContainerRef as unknown as React.RefObject<HTMLDivElement>, // Pass the ref directly
     isMapApiLoaded: isMapApiLoaded, // Pass the API loaded state
     route: sampleRoute,
     autoFit: true,
