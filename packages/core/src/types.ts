@@ -33,6 +33,9 @@ export interface CameraOptions {
   zoomLevel?: number;
 }
 
+/** Renderer types available. */
+export type RendererType = "marker" | "webgl"; // Add more as they are implemented
+
 /** Configuration options for creating a new player instance. */
 export interface PlayerOptions {
   /** The Google Maps instance to render on. */
@@ -57,6 +60,9 @@ export interface PlayerOptions {
   // Camera options
   cameraMode?: CameraMode;
   cameraOptions?: CameraOptions;
+
+  // Renderer options
+  rendererType?: RendererType; // ADDED: Select the renderer type
 }
 
 /** Events emitted by the player instance. */

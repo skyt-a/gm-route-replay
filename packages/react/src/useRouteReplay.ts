@@ -40,6 +40,7 @@ interface UseRouteReplayOptions {
   mapContainerRef: React.RefObject<HTMLDivElement | null>;
   isMapApiLoaded?: boolean;
   cameraMode?: CameraMode;
+  mapId?: string; // ADDED: Optional Map ID for vector maps/WebGL features
 }
 
 interface RouteReplayState {
@@ -67,11 +68,9 @@ interface UseRouteReplayResult {
 export function useRouteReplay(
   options: UseRouteReplayOptions
 ): UseRouteReplayResult {
-  const { mapContainerRef, isMapApiLoaded, ...coreOptions } = options;
-  // coreOptions should now correctly infer the type based on the explicit interface
+  const { mapContainerRef, isMapApiLoaded, mapId, ...coreOptions } = options;
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const playerRef = useRef<PlayerHandle | null>(null);
-  // Store the potentially changing options in a ref
   const optionsRef = useRef(options);
 
   const [playerState, setPlayerState] = useState<RouteReplayState>({
@@ -95,31 +94,26 @@ export function useRouteReplay(
 
   // Initialize map instance effect
   useEffect(() => {
-    // This effect now depends on isMapApiLoaded
     if (
-      isMapApiLoaded && // Check if API is loaded via prop
+      isMapApiLoaded &&
       mapContainerRef.current &&
       !mapInstanceRef.current &&
       typeof google !== "undefined" &&
       google.maps
     ) {
-      console.log(
-        "API loaded and Ref available. Initializing Google Map instance on ref:",
-        mapContainerRef.current
-      );
+      console.log("Initializing Google Map instance with Map ID:", mapId);
       try {
-        // Basic map initialization, user should customize this
         const map = new google.maps.Map(mapContainerRef.current, {
-          center: { lat: 0, lng: 0 }, // Default center, should be overridden by autoFit
+          center: { lat: 0, lng: 0 },
           zoom: 3,
-          disableDefaultUI: true, // Good default for programmatic control
+          disableDefaultUI: true,
+          mapId: mapId, // Pass the mapId here
         });
         mapInstanceRef.current = map;
         setIsMapInitialized(true);
         console.log("Google Map instance created.");
       } catch (error) {
         console.error("Error initializing Google Map:", error);
-        // Handle map initialization error
       }
     }
 
@@ -131,7 +125,7 @@ export function useRouteReplay(
     //     setIsMapInitialized(false);
     //   }
     // };
-  }, [isMapApiLoaded, mapContainerRef]); // Add isMapApiLoaded to dependency array
+  }, [isMapApiLoaded, mapContainerRef, mapId]); // Add mapId to dependencies
 
   // Initialize and manage player instance effect
   useEffect(() => {

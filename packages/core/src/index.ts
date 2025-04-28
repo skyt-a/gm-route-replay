@@ -13,7 +13,9 @@ import {
 import { Animator } from "./animator";
 import { MarkerRenderer } from "./renderers/marker";
 import { PolylineRenderer } from "./renderers/polyline";
+import { WebGLOverlayRenderer } from "./renderers/webgl";
 import { interpolateRoute, InterpolatedPoint } from "./interpolator";
+import type { IRenderer } from "./renderers/types";
 
 export function createPlayer(options: PlayerOptions): PlayerHandle {
   // --- Input Validation ---
@@ -78,10 +80,22 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
     fps: options.fps ?? 60,
     initialSpeed: options.initialSpeed,
   });
-  const markerRenderer = new MarkerRenderer({
-    map: options.map,
-    markerOptions: options.markerOptions,
-  });
+
+  // --- Renderer Initialization (Marker or WebGL) ---
+  let markerRenderer: IRenderer | null = null;
+  if (options.rendererType === "webgl") {
+    console.log("Using WebGLOverlayRenderer");
+    markerRenderer = new WebGLOverlayRenderer({ map: options.map });
+  } else {
+    console.log("Using MarkerRenderer (default)");
+    markerRenderer = new MarkerRenderer({
+      map: options.map,
+      markerOptions: options.markerOptions,
+    });
+  }
+  markerRenderer.mount();
+  // --- End Renderer Initialization ---
+
   let polylineRenderer: PolylineRenderer | null = null;
   if (options.polylineOptions) {
     polylineRenderer = new PolylineRenderer({
@@ -135,7 +149,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
   function processRouteData(input: PlayerOptions["route"]) {
     // Reset previous state
     animator.stop();
-    markerRenderer.removeAllMarkers();
+    markerRenderer?.removeAllMarkers();
     polylineRenderer?.resetAllPaths();
     processedRoutes.clear();
     trackIds = [];
@@ -240,7 +254,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
       );
 
       if (initialInterpolated) {
-        markerRenderer.updateMarker(
+        markerRenderer?.updateMarker(
           trackId,
           { lat: initialInterpolated.lat, lng: initialInterpolated.lng },
           initialInterpolated.heading
@@ -317,7 +331,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
 
       if (interpolated) {
         const pos = { lat: interpolated.lat, lng: interpolated.lng };
-        markerRenderer.updateMarker(trackId, pos, interpolated.heading);
+        markerRenderer?.updateMarker(trackId, pos, interpolated.heading);
         const shouldAddToPolyline =
           !isClamped || trackRelativeTimeMs >= trackDuration;
         if (shouldAddToPolyline) {
@@ -331,7 +345,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
           progress: interpolated.progress,
         });
       } else {
-        markerRenderer.removeMarker(trackId);
+        markerRenderer?.removeMarker(trackId);
         console.warn(`Interpolation failed unexpectedly for track ${trackId}`);
       }
     });
@@ -430,7 +444,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
         const currentRouteData = processedRoutes.get(trackId);
         if (!currentRouteData || currentRouteData.length === 0) return;
         const finalPoint = currentRouteData[currentRouteData.length - 1];
-        markerRenderer.updateMarker(
+        markerRenderer?.updateMarker(
           trackId,
           { lat: finalPoint.lat, lng: finalPoint.lng },
           finalPoint.heading
@@ -464,7 +478,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
           const currentRouteData = processedRoutes.get(trackId);
           if (!currentRouteData || currentRouteData.length === 0) return;
           const initialPoint = currentRouteData[0];
-          markerRenderer.updateMarker(
+          markerRenderer?.updateMarker(
             trackId,
             { lat: initialPoint.lat, lng: initialPoint.lng },
             initialPoint.heading
@@ -492,11 +506,11 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
       trackIds.forEach((trackId) => {
         const currentRouteData = processedRoutes.get(trackId);
         if (!currentRouteData || currentRouteData.length === 0) {
-          markerRenderer.removeMarker(trackId);
+          markerRenderer?.removeMarker(trackId);
           return;
         }
         const initialPoint = currentRouteData[0];
-        markerRenderer.updateMarker(
+        markerRenderer?.updateMarker(
           trackId,
           { lat: initialPoint.lat, lng: initialPoint.lng },
           initialPoint.heading
@@ -526,7 +540,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
         );
 
         if (interpolated) {
-          markerRenderer.updateMarker(
+          markerRenderer?.updateMarker(
             trackId,
             { lat: interpolated.lat, lng: interpolated.lng },
             interpolated.heading
@@ -614,7 +628,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
             `Interpolation failed during seek for track ${trackId}.`
           );
           if (clampedMs === 0 && currentRouteData.length > 0) {
-            markerRenderer.updateMarker(
+            markerRenderer?.updateMarker(
               trackId,
               { lat: currentRouteData[0].lat, lng: currentRouteData[0].lng },
               currentRouteData[0].heading
@@ -661,7 +675,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
     destroy: () => {
       console.log("destroy() called");
       animator.destroy();
-      markerRenderer.destroy();
+      markerRenderer?.destroy();
       polylineRenderer?.destroy();
       Object.keys(eventListeners).forEach((key) => {
         delete eventListeners[key as PlayerEvent];

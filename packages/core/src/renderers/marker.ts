@@ -1,5 +1,6 @@
 /// <reference types="@types/google.maps" />
 
+import type { IRenderer } from "./types"; // Import the interface
 import type { PlayerOptions } from "../types";
 
 interface MarkerRendererOptions {
@@ -7,7 +8,8 @@ interface MarkerRendererOptions {
   markerOptions?: google.maps.MarkerOptions; // Base options for all markers
 }
 
-export class MarkerRenderer {
+export class MarkerRenderer implements IRenderer {
+  // Implement IRenderer
   private map: google.maps.Map;
   private baseMarkerOptions: google.maps.MarkerOptions;
   private markers = new Map<string, google.maps.Marker>();
@@ -22,9 +24,21 @@ export class MarkerRenderer {
       crossOnDrag: false,
       ...(markerOptions || {}),
       position: { lat: 0, lng: 0 }, // Initial position, will be updated
-      map: null, // Don't add to map initially
+      map: null, // Keep null initially
     };
-    console.log("MarkerRenderer initialized for multi-track.");
+    console.log("MarkerRenderer initialized (implements IRenderer).");
+  }
+
+  /** Mounts markers to the map (makes existing markers visible). */
+  mount(): void {
+    // This ensures markers created *before* mount are added to the map.
+    // Markers created by updateMarker are added immediately.
+    this.markers.forEach((marker) => {
+      if (!marker.getMap()) {
+        marker.setMap(this.map);
+      }
+    });
+    console.log("MarkerRenderer mounted (existing markers set to map).");
   }
 
   /**
@@ -98,6 +112,11 @@ export class MarkerRenderer {
         });
       }
       this.lastHeadings.set(trackId, heading);
+    }
+
+    // Ensure map is set when creating/updating
+    if (!marker.getMap()) {
+      marker.setMap(this.map);
     }
   }
 
