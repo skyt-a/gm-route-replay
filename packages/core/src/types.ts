@@ -20,6 +20,19 @@ export type RouteInput =
   | { [trackId: string]: RoutePoint[] }
   | string;
 
+/** Camera follow modes. */
+export type CameraMode = "center" | "ahead" | "none";
+
+/** Options for camera control. */
+export interface CameraOptions {
+  /** Distance in meters to look ahead in 'ahead' mode. Defaults to 100. */
+  aheadDistance?: number;
+  /** Default tilt angle for 'ahead' mode. Defaults to 45. */
+  defaultTilt?: number;
+  /** Fixed zoom level for camera modes, overrides autoFit zoom */
+  zoomLevel?: number;
+}
+
 /** Configuration options for creating a new player instance. */
 export interface PlayerOptions {
   /** The Google Maps instance to render on. */
@@ -40,6 +53,10 @@ export interface PlayerOptions {
   interpolation?: "linear" | "spline";
   /** Array of plugins to extend player functionality. */
   plugins?: Plugin[];
+
+  // Camera options
+  cameraMode?: CameraMode;
+  cameraOptions?: CameraOptions;
 }
 
 /** Events emitted by the player instance. */
@@ -80,6 +97,8 @@ export interface PlayerHandle {
   setSpeed(multiplier: number): void;
   /** Sets the playback direction (not implemented yet). */
   setDirection(dir: "forward" | "reverse"): void;
+  /** Sets the camera follow mode. */
+  setCameraMode(mode: CameraMode, options?: CameraOptions): void;
   /** Registers an event listener. */
   on<E extends PlayerEvent>(ev: E, cb: PlayerEventMap[E]): void;
   /** Cleans up the player instance, removes map elements, and stops animation. */

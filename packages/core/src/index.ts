@@ -6,6 +6,9 @@ import {
   RoutePoint,
   PlayerEventMap,
   PlayerEvent,
+  RouteInput,
+  CameraMode,
+  CameraOptions,
 } from "./types";
 import { Animator } from "./animator";
 import { MarkerRenderer } from "./renderers/marker";
@@ -62,6 +65,12 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
   let globalStartTimeMs: number = Infinity;
   let globalEndTimeMs: number = -Infinity;
   let globalDurationMs: number = 0;
+  let currentCameraMode: CameraMode = options.cameraMode ?? "center";
+  let currentCameraOptions: Required<CameraOptions> = {
+    aheadDistance: options.cameraOptions?.aheadDistance ?? 100,
+    defaultTilt: options.cameraOptions?.defaultTilt ?? 45,
+    zoomLevel: options.cameraOptions?.zoomLevel ?? 15,
+  };
   let isInitialized: boolean = false;
 
   // --- Component Initialization ---
@@ -247,28 +256,38 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
       options.map.fitBounds(bounds);
       console.log("Map bounds fitted to all tracks.");
     }
+
+    // Initialize camera mode from options again in case route changes
+    currentCameraMode = options.cameraMode ?? "center";
+    currentCameraOptions = {
+      aheadDistance: options.cameraOptions?.aheadDistance ?? 100,
+      defaultTilt: options.cameraOptions?.defaultTilt ?? 45,
+      zoomLevel: options.cameraOptions?.zoomLevel ?? 15,
+    };
+
+    console.log(`Initial camera mode: ${currentCameraMode}`);
   }
 
   // --- Core Animation Callback ---
   const handleFrame = (timelineTimeMs: number): void => {
-    if (!isInitialized || globalDurationMs <= 0) return;
+    if (!isInitialized || globalDurationMs <= 0) {
+      return;
+    }
 
     const clampedTimelineTimeMs = Math.min(timelineTimeMs, globalDurationMs);
 
+    // --- Update Renderers for ALL tracks FIRST ---
     trackIds.forEach((trackId) => {
       const currentRouteData = processedRoutes.get(trackId);
       const trackStartTime = trackStartTimes.get(trackId);
       const trackDuration = trackDurations.get(trackId);
-
       if (
         !currentRouteData ||
         trackStartTime === undefined ||
         trackDuration === undefined
-      ) {
-        return; // Skip if track data is missing
-      }
+      )
+        return;
 
-      // Calculate time relative to this track's start time
       const timeRelativeToGlobalStart = clampedTimelineTimeMs;
       const trackStartTimeRelativeToGlobalStart =
         trackStartTime - globalStartTimeMs;
@@ -276,7 +295,7 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
         timeRelativeToGlobalStart - trackStartTimeRelativeToGlobalStart;
 
       let interpolated: InterpolatedPoint | null = null;
-      let isClamped = false; // Flag to indicate if we used a clamped start/end point
+      let isClamped = false;
 
       if (trackRelativeTimeMs >= 0 && trackRelativeTimeMs <= trackDuration) {
         interpolated = interpolateRoute(
@@ -286,41 +305,28 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
           trackDuration
         );
       } else if (trackRelativeTimeMs < 0) {
-        const firstPoint = currentRouteData[0];
-        interpolated = { ...firstPoint, progress: 0 };
-        isClamped = true; // Mark as clamped to start
+        interpolated = { ...currentRouteData[0], progress: 0 };
+        isClamped = true;
       } else {
-        // trackRelativeTimeMs > trackDuration
-        const lastPoint = currentRouteData[currentRouteData.length - 1];
-        interpolated = { ...lastPoint, progress: 1 };
-        isClamped = true; // Mark as clamped to end
+        interpolated = {
+          ...currentRouteData[currentRouteData.length - 1],
+          progress: 1,
+        };
+        isClamped = true;
       }
 
       if (interpolated) {
-        // Always update the marker position (to show start/end position even when clamped)
-        markerRenderer.updateMarker(
-          trackId,
-          { lat: interpolated.lat, lng: interpolated.lng },
-          interpolated.heading
-        );
-
-        // Only add to polyline if it wasn't a clamped start/end point
-        // and the track is currently active or just finished (to draw the last segment)
-        // Allow adding if clamped to end to ensure the last point is drawn
+        const pos = { lat: interpolated.lat, lng: interpolated.lng };
+        markerRenderer.updateMarker(trackId, pos, interpolated.heading);
         const shouldAddToPolyline =
           !isClamped || trackRelativeTimeMs >= trackDuration;
-
         if (shouldAddToPolyline) {
-          polylineRenderer?.addPoint(trackId, {
-            lat: interpolated.lat,
-            lng: interpolated.lng,
-          });
+          polylineRenderer?.addPoint(trackId, pos);
         }
-
-        // Emit frame event based on interpolated data
+        // Emit frame event regardless of camera focus
         emit("frame", {
-          trackId: trackId,
-          pos: { lat: interpolated.lat, lng: interpolated.lng },
+          trackId,
+          pos,
           heading: interpolated.heading,
           progress: interpolated.progress,
         });
@@ -329,6 +335,90 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
         console.warn(`Interpolation failed unexpectedly for track ${trackId}`);
       }
     });
+    // --- End Renderer Update Loop ---
+
+    // --- Camera Update Logic (if mode is not 'none') ---
+    if (currentCameraMode !== "none") {
+      const followTrackId = trackIds.length > 0 ? trackIds[0] : null;
+      if (followTrackId) {
+        const routeData = processedRoutes.get(followTrackId);
+        const trackStartTime = trackStartTimes.get(followTrackId);
+        const trackDuration = trackDurations.get(followTrackId);
+        if (
+          routeData &&
+          trackStartTime !== undefined &&
+          trackDuration !== undefined
+        ) {
+          const timeRelativeToGlobalStart = clampedTimelineTimeMs;
+          const trackStartTimeRelativeToGlobalStart =
+            trackStartTime - globalStartTimeMs;
+          const trackRelativeTimeMs =
+            timeRelativeToGlobalStart - trackStartTimeRelativeToGlobalStart;
+
+          let followInterpolated: InterpolatedPoint | null = null;
+          if (
+            trackRelativeTimeMs >= 0 &&
+            trackRelativeTimeMs <= trackDuration
+          ) {
+            followInterpolated = interpolateRoute(
+              routeData,
+              trackRelativeTimeMs,
+              trackStartTime,
+              trackDuration
+            );
+          } else if (trackRelativeTimeMs < 0) {
+            followInterpolated = { ...routeData[0], progress: 0 };
+          } else {
+            followInterpolated = {
+              ...routeData[routeData.length - 1],
+              progress: 1,
+            };
+          }
+
+          if (followInterpolated) {
+            const currentPosition = {
+              lat: followInterpolated.lat,
+              lng: followInterpolated.lng,
+            };
+            const currentHeading = followInterpolated.heading;
+
+            if (currentCameraMode === "center") {
+              options.map.panTo(currentPosition);
+            } else if (
+              currentCameraMode === "ahead" &&
+              currentHeading !== undefined
+            ) {
+              // Check if geometry library is loaded
+              if (typeof google?.maps?.geometry?.spherical !== "undefined") {
+                // For 'ahead', we might want to smoothly animate the camera
+                options.map.moveCamera({
+                  center: currentPosition,
+                  heading: currentHeading,
+                  tilt: currentCameraOptions.defaultTilt,
+                  zoom: currentCameraOptions.zoomLevel, // Use configured zoom
+                });
+              } else {
+                console.warn(
+                  "Camera 'ahead' mode requires google.maps.geometry library."
+                );
+                // Fallback to 'center' mode if geometry lib not available
+                options.map.panTo(currentPosition);
+              }
+            } else if (
+              currentCameraMode === "ahead" &&
+              currentHeading === undefined
+            ) {
+              console.warn(
+                "Camera 'ahead' mode requires heading data or calculation."
+              );
+              // Fallback to 'center' mode if heading is missing
+              options.map.panTo(currentPosition);
+            }
+          }
+        }
+      }
+    }
+    // --- End Camera Update Logic ---
 
     // Check global finish condition
     if (clampedTimelineTimeMs >= globalDurationMs) {
@@ -544,6 +634,22 @@ export function createPlayer(options: PlayerOptions): PlayerHandle {
     },
     setDirection: (dir: "forward" | "reverse") => {
       console.warn(`setDirection(${dir}) not implemented yet.`);
+    },
+    setCameraMode: (mode: CameraMode, newOptions?: CameraOptions) => {
+      console.log(`Setting camera mode to ${mode}`, newOptions);
+      currentCameraMode = mode;
+      if (newOptions) {
+        // Update specified options, keeping existing defaults for others
+        currentCameraOptions = {
+          aheadDistance:
+            newOptions.aheadDistance ?? currentCameraOptions.aheadDistance,
+          defaultTilt:
+            newOptions.defaultTilt ?? currentCameraOptions.defaultTilt,
+          zoomLevel: newOptions.zoomLevel ?? currentCameraOptions.zoomLevel,
+        };
+        console.log("Updated camera options:", currentCameraOptions);
+      }
+      // Apply immediately? No, handleFrame will pick up the new mode.
     },
     on: <E extends PlayerEvent>(event: E, cb: PlayerEventMap[E]): void => {
       if (!eventListeners[event]) {

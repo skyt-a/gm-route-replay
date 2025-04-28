@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useRouteReplay } from "@gm/route-replay-react"; // Assuming workspace link works
-import type { RoutePoint, RouteInput } from "@gm/route-replay-core";
+import type { RoutePoint, RouteInput, CameraMode } from "@gm/route-replay-core";
 import "./App.css";
 
 // --- Sample Data & Config (Outside Component) ---
@@ -81,16 +81,46 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
 
+  // Effect to handle map loading (ADD geometry library)
+  useEffect(() => {
+    if (!apiKey) {
+      setError("Missing VITE_GOOGLE_MAPS_API_KEY in .env file");
+      return;
+    }
+    const loader = new Loader({
+      apiKey: apiKey,
+      version: "weekly",
+      libraries: ["maps", "geometry"], // ADDED geometry library
+    });
+    loader
+      .load()
+      .then(() => {
+        console.log("Google Maps API loaded (maps, geometry)");
+        setIsMapApiLoaded(true);
+      })
+      .catch((e: unknown) => {
+        console.error("Error loading Google Maps API:", e);
+        setError("Failed to load Google Maps API. Check API key and network.");
+      });
+  }, [apiKey]);
+
   // Memoize the options object passed to the hook
   const routeReplayOptions = useMemo(
     () => ({
       mapContainerRef: mapContainerRef as React.RefObject<HTMLDivElement>,
       isMapApiLoaded: isMapApiLoaded,
-      route: multiTrackRouteData, // Use the multi-track data
+      route: multiTrackRouteData,
       autoFit: true,
       markerOptions: markerOptionsConfig,
       polylineOptions: polylineOptionsConfig,
       initialSpeed: 1,
+      cameraMode: "center", // Set initial camera mode
+      cameraOptions: {
+        // Example options
+        // aheadDistance: 150,
+        // defaultTilt: 50,
+        zoomLevel: 16, // Set a default zoom for camera follow
+      },
     }),
     [isMapApiLoaded]
   );
@@ -119,30 +149,15 @@ function App() {
     [controls]
   );
 
-  // --- Effect for map loading (can stay here) ---
-  useEffect(() => {
-    if (!apiKey) {
-      setError("Missing VITE_GOOGLE_MAPS_API_KEY in .env file");
-      return;
-    }
-
-    const loader = new Loader({
-      apiKey: apiKey,
-      version: "weekly",
-      libraries: ["maps"],
-    });
-
-    loader
-      .load()
-      .then(() => {
-        console.log("Google Maps API loaded");
-        setIsMapApiLoaded(true); // Mark API as loaded
-      })
-      .catch((e: unknown) => {
-        console.error("Error loading Google Maps API:", e);
-        setError("Failed to load Google Maps API. Check API key and network.");
-      });
-  }, [apiKey]);
+  // Callback for camera mode change
+  const handleCameraModeChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const mode = event.target.value as CameraMode;
+      // TODO: Pass options if needed for 'ahead' mode customization
+      (controls as any).setCameraMode(mode);
+    },
+    [controls]
+  );
 
   // Log state changes for debugging
   useEffect(() => {
@@ -219,6 +234,44 @@ function App() {
         <button onClick={() => handleSetSpeed(4)} disabled={!isMapApiLoaded}>
           4x
         </button>
+      </div>
+
+      {/* Camera Mode Controls */}
+      <div className="controls camera-controls">
+        <span>Camera Mode:</span>
+        <label style={{ marginLeft: "10px" }}>
+          <input
+            type="radio"
+            name="cameraMode"
+            value="center"
+            checked={state.cameraMode === "center"}
+            onChange={handleCameraModeChange}
+            disabled={!isMapApiLoaded}
+          />{" "}
+          Center
+        </label>
+        <label style={{ marginLeft: "10px" }}>
+          <input
+            type="radio"
+            name="cameraMode"
+            value="ahead"
+            checked={state.cameraMode === "ahead"}
+            onChange={handleCameraModeChange}
+            disabled={!isMapApiLoaded}
+          />{" "}
+          Ahead
+        </label>
+        <label style={{ marginLeft: "10px" }}>
+          <input
+            type="radio"
+            name="cameraMode"
+            value="none"
+            checked={state.cameraMode === "none"}
+            onChange={handleCameraModeChange}
+            disabled={!isMapApiLoaded}
+          />{" "}
+          None
+        </label>
       </div>
 
       <div className="state">

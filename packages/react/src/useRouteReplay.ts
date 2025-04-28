@@ -10,6 +10,10 @@ import {
   PlayerEventMap,
   RoutePoint,
   Plugin,
+  // @ts-ignore Ignore potential export error due to build cache
+  CameraMode,
+  // @ts-ignore Ignore potential export error due to build cache
+  CameraOptions,
 } from "@gm/route-replay-core";
 
 // Re-define RouteInput locally to avoid export issues
@@ -35,6 +39,7 @@ interface UseRouteReplayOptions {
   // Hook-specific options
   mapContainerRef: React.RefObject<HTMLDivElement | null>;
   isMapApiLoaded?: boolean;
+  cameraMode?: CameraMode;
 }
 
 interface RouteReplayState {
@@ -42,6 +47,7 @@ interface RouteReplayState {
   progress: number;
   speed: number;
   durationMs: number;
+  cameraMode: CameraMode;
 }
 
 // Define the return type of the hook explicitly
@@ -54,6 +60,7 @@ interface UseRouteReplayResult {
     stop: () => void;
     seek: (ms: number) => void;
     setSpeed: (multiplier: number) => void;
+    setCameraMode: (mode: CameraMode, options?: CameraOptions) => void;
   };
 }
 
@@ -70,20 +77,21 @@ export function useRouteReplay(
   const [playerState, setPlayerState] = useState<RouteReplayState>({
     isPlaying: false,
     progress: 0,
-    speed: options.initialSpeed ?? 1, // Use initialSpeed from options
+    speed: options.initialSpeed ?? 1,
     durationMs: 0,
+    cameraMode: options.cameraMode ?? "center",
   });
   const [isMapInitialized, setIsMapInitialized] = useState(false);
 
   // Update optionsRef whenever options change
   useEffect(() => {
     optionsRef.current = options;
-    // Update speed in state if initialSpeed option changes
     setPlayerState((prevState) => ({
       ...prevState,
       speed: options.initialSpeed ?? prevState.speed,
+      cameraMode: options.cameraMode ?? prevState.cameraMode,
     }));
-  }, [options]); // Dependency is now the whole options object
+  }, [options]);
 
   // Initialize map instance effect
   useEffect(() => {
@@ -235,6 +243,12 @@ export function useRouteReplay(
         player.on("seek", handleSeek);
         player.on("finish", handleFinish);
         player.on("error", handleError);
+
+        // Initialize state based on created player (if needed, though options cover it now)
+        setPlayerState((prevState) => ({
+          ...prevState,
+          cameraMode: optionsRef.current.cameraMode ?? "center",
+        }));
       } catch (error) {
         console.error("Hook: Failed to create or setup player:", error);
       }
@@ -253,6 +267,7 @@ export function useRouteReplay(
           progress: 0,
           speed: optionsRef.current.initialSpeed ?? 1,
           durationMs: 0,
+          cameraMode: optionsRef.current.cameraMode ?? "center",
         });
         // Reset map init status? Maybe not necessary if container ref doesn't change
         // setIsMapInitialized(false);
@@ -289,15 +304,33 @@ export function useRouteReplay(
     setPlayerState((prevState) => ({ ...prevState, speed: multiplier }));
   }, []);
 
+  const setCameraMode = useCallback(
+    (mode: CameraMode, camOptions?: CameraOptions) => {
+      console.log(`[Hook] Calling player.setCameraMode(${mode})`, camOptions);
+      // @ts-ignore Ignore potential method not found error due to build cache
+      playerRef.current?.setCameraMode(mode, camOptions);
+      setPlayerState((prevState) => ({
+        ...prevState,
+        cameraMode: mode as CameraMode,
+      }));
+    },
+    []
+  );
+
+  // Log the controls object before returning
+  const controlsObject = {
+    play,
+    pause,
+    stop,
+    seek,
+    setSpeed,
+    setCameraMode,
+  };
+  console.log("[Hook] Returning controls object:", controlsObject);
+
   return {
     player: playerRef.current,
     state: playerState,
-    controls: {
-      play,
-      pause,
-      stop,
-      seek,
-      setSpeed,
-    },
+    controls: controlsObject,
   };
 }
