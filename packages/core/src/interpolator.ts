@@ -34,6 +34,8 @@ export interface InterpolatedPoint {
 
 /**
  * Finds the segment and interpolation factor for a given time in the route.
+ * Calculates heading based on segment direction if not present in data.
+ * Requires google.maps.geometry library to be loaded for heading calculation.
  * @param route Sorted array of RoutePoints.
  * @param timeMs The target time in milliseconds (relative to the route's start time).
  * @param startTimeMs The timestamp of the first point in the route.
@@ -46,35 +48,72 @@ export function interpolateRoute(
   startTimeMs: number,
   durationMs: number
 ): InterpolatedPoint | null {
-  if (!route || route.length < 2 || timeMs < 0 || timeMs > durationMs) {
-    // Return start or end point if slightly out of bounds due to timing?
-    // For now, return null if strictly out of bounds.
-    if (timeMs <= 0 && route.length > 0) {
-      return {
-        lat: route[0].lat,
-        lng: route[0].lng,
-        heading: route[0].heading,
-        progress: 0,
-      };
+  // --- Time bounds check (return start/end point) ---
+  if (timeMs <= 0 && route.length > 0) {
+    // Calculate heading from first segment if needed
+    let heading = route[0].heading;
+    if (
+      heading === undefined &&
+      route.length > 1 &&
+      typeof google?.maps?.geometry?.spherical !== "undefined"
+    ) {
+      heading = google.maps.geometry.spherical.computeHeading(
+        route[0],
+        route[1]
+      );
     }
-    if (timeMs >= durationMs && route.length > 0) {
-      const lastPoint = route[route.length - 1];
-      return {
-        lat: lastPoint.lat,
-        lng: lastPoint.lng,
-        heading: lastPoint.heading,
-        progress: 1,
-      };
-    }
-    return null;
+    return {
+      lat: route[0].lat,
+      lng: route[0].lng,
+      heading: heading,
+      progress: 0,
+    };
   }
+  if (timeMs >= durationMs && route.length > 0) {
+    const lastPoint = route[route.length - 1];
+    // Calculate heading from last segment if needed
+    let heading = lastPoint.heading;
+    if (
+      heading === undefined &&
+      route.length > 1 &&
+      typeof google?.maps?.geometry?.spherical !== "undefined"
+    ) {
+      heading = google.maps.geometry.spherical.computeHeading(
+        route[route.length - 2],
+        lastPoint
+      );
+    }
+    return {
+      lat: lastPoint.lat,
+      lng: lastPoint.lng,
+      heading: heading,
+      progress: 1,
+    };
+  }
+  if (!route || route.length < 2 || timeMs < 0 || timeMs > durationMs) {
+    return null; // Should not happen after bounds check, but safety return
+  }
+  // --- End Time bounds check ---
 
   const targetTimestamp = startTimeMs + timeMs;
 
-  // Find the segment [p1, p2] that contains the targetTimestamp
+  // Find the segment [p1, p2]
   let p1: RoutePoint | null = null;
   let p2: RoutePoint | null = null;
+  // Optimize search? For now, linear scan is fine.
   for (let i = 0; i < route.length - 1; i++) {
+    // Handle segment with zero duration (identical timestamps)
+    if (route[i].t === route[i + 1].t) {
+      // If target time matches the identical timestamp, use the second point of the pair
+      if (targetTimestamp === route[i].t) {
+        p1 = route[i];
+        p2 = route[i + 1];
+        break;
+      }
+      // Otherwise, skip this zero-duration segment for finding the interval
+      continue;
+    }
+    // Normal segment check
     if (targetTimestamp >= route[i].t && targetTimestamp <= route[i + 1].t) {
       p1 = route[i];
       p2 = route[i + 1];
@@ -82,23 +121,18 @@ export function interpolateRoute(
     }
   }
 
-  // This should generally not happen if timeMs is within bounds, but handle defensively
   if (!p1 || !p2) {
-    // Fallback to the last point if something went wrong
-    const lastPoint = route[route.length - 1];
-    console.warn("Interpolator fallback triggered for timeMs:", timeMs);
-    return {
-      lat: lastPoint.lat,
-      lng: lastPoint.lng,
-      heading: lastPoint.heading,
-      progress: 1,
-    };
-    // return null;
+    console.warn(
+      "Interpolator could not find segment for timeMs:",
+      timeMs,
+      " Target Ts:",
+      targetTimestamp
+    );
+    return null; // Return null if segment not found
   }
 
-  // Calculate interpolation factor 't' within the segment [p1, p2]
+  // Calculate interpolation factor 't'
   const segmentDuration = p2.t - p1.t;
-  // Avoid division by zero if timestamps are identical
   const t =
     segmentDuration > 0 ? (targetTimestamp - p1.t) / segmentDuration : 1.0;
 
@@ -106,16 +140,30 @@ export function interpolateRoute(
   const lng = lerp(p1.lng, p2.lng, t);
   let heading: number | undefined = undefined;
 
-  // Interpolate heading if both points have it
+  // --- Heading calculation/interpolation ---
   if (p1.heading !== undefined && p2.heading !== undefined) {
+    // Interpolate if both points have heading
     heading = interpolateHeading(p1.heading, p2.heading, t);
+  } else if (p1.heading !== undefined && segmentDuration === 0) {
+    // If segment duration is 0, use p1's heading if available
+    heading = p1.heading;
+  } else if (typeof google?.maps?.geometry?.spherical !== "undefined") {
+    // Calculate heading from segment direction if geometry library is loaded
+    // Avoid calculation for zero-length segments to prevent NaN heading
+    if (p1.lat !== p2.lat || p1.lng !== p2.lng) {
+      heading = google.maps.geometry.spherical.computeHeading(p1, p2);
+    } else {
+      // Use previous point's heading or p1's heading if available
+      heading = p1.heading; // Fallback to p1's heading if segment has zero length
+    }
   } else {
-    // If only one point has heading, or for the last segment, use the start point's heading
+    // Fallback: Use start point's heading if available, otherwise undefined
     heading = p1.heading;
   }
+  // --- End Heading calculation ---
 
   const progress =
     durationMs > 0 ? timeMs / durationMs : timeMs >= durationMs ? 1 : 0;
 
-  return { lat, lng, heading, progress: Math.min(1, Math.max(0, progress)) }; // Clamp progress
+  return { lat, lng, heading, progress: Math.min(1, Math.max(0, progress)) };
 }

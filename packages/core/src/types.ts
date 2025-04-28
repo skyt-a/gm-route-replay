@@ -14,24 +14,55 @@ export interface RoutePoint {
   elev?: number;
 }
 
+/** Input format for route data. Can be a single route, multiple named routes, or a URL. */
+export type RouteInput =
+  | RoutePoint[]
+  | { [trackId: string]: RoutePoint[] }
+  | string;
+
+/** Camera follow modes. */
+export type CameraMode = "center" | "ahead" | "none";
+
+/** Options for camera control. */
+export interface CameraOptions {
+  /** Distance in meters to look ahead in 'ahead' mode. Defaults to 100. */
+  aheadDistance?: number;
+  /** Default tilt angle for 'ahead' mode. Defaults to 45. */
+  defaultTilt?: number;
+  /** Fixed zoom level for camera modes, overrides autoFit zoom */
+  zoomLevel?: number;
+}
+
+/** Renderer types available. */
+export type RendererType = "marker" | "webgl"; // Add more as they are implemented
+
 /** Configuration options for creating a new player instance. */
 export interface PlayerOptions {
   /** The Google Maps instance to render on. */
   map: google.maps.Map;
-  /** The route data, either as an array of points or a URL to a GPX/GeoJSON file. */
-  route: RoutePoint[] | string;
+  /** The route data. */
+  route: RouteInput;
   /** Target frames per second for animation (default: 60). */
   fps?: 60 | 30;
+  /** Initial playback speed (default 1). */
+  initialSpeed?: number;
   /** Whether to automatically fit the map bounds to the route on load (default: true). */
   autoFit?: boolean;
-  /** Options to pass to the underlying Google Maps Marker. */
+  /** Options to pass to the underlying Google Maps Marker(s). Applied to all tracks unless overridden. */
   markerOptions?: google.maps.MarkerOptions;
-  /** Options to pass to the underlying Google Maps Polyline (if enabled). */
+  /** Options to pass to the underlying Google Maps Polyline(s) (if enabled). Applied to all tracks unless overridden. */
   polylineOptions?: google.maps.PolylineOptions;
   /** Interpolation method between points (default: 'linear'). */
   interpolation?: "linear" | "spline";
   /** Array of plugins to extend player functionality. */
   plugins?: Plugin[];
+
+  // Camera options
+  cameraMode?: CameraMode;
+  cameraOptions?: CameraOptions;
+
+  // Renderer options
+  rendererType?: RendererType; // ADDED: Select the renderer type
 }
 
 /** Events emitted by the player instance. */
@@ -60,21 +91,23 @@ export interface PlayerEventMap {
 
 /** The interface returned by `createPlayer`, providing control methods and event subscription. */
 export interface PlayerHandle {
-  /** Starts playback from the current position. */
+  /** Starts or resumes playback from the current time. */
   play(): void;
-  /** Pauses playback at the current position. */
+  /** Pauses playback at the current time. */
   pause(): void;
-  /** Stops playback and resets the timeline to the beginning. */
+  /** Stops playback and resets the time to the beginning. */
   stop(): void;
-  /** Seeks to an absolute time in milliseconds along the route timeline. */
+  /** Jumps to a specific time in the playback timeline. */
   seek(ms: number): void;
-  /** Sets the playback speed multiplier (e.g., 1 = normal, 2 = double speed). */
+  /** Sets the playback speed multiplier (e.g., 1 for normal, 2 for double speed). */
   setSpeed(multiplier: number): void;
-  /** Sets the playback direction. */
+  /** Sets the playback direction (not implemented yet). */
   setDirection(dir: "forward" | "reverse"): void;
-  /** Subscribes to player events. */
-  on<E extends PlayerEvent>(event: E, callback: PlayerEventMap[E]): void;
-  /** Cleans up resources used by the player instance. */
+  /** Sets the camera follow mode. */
+  setCameraMode(mode: CameraMode, options?: CameraOptions): void;
+  /** Registers an event listener. */
+  on<E extends PlayerEvent>(ev: E, cb: PlayerEventMap[E]): void;
+  /** Cleans up the player instance, removes map elements, and stops animation. */
   destroy(): void;
 }
 

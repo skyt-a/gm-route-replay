@@ -1,3 +1,10 @@
+# Basic React Example
+
+This page shows a basic usage example using the React hook.
+
+Make sure you have a `.env` file in the `examples/react-vite` directory with your `VITE_GOOGLE_MAPS_API_KEY` and `VITE_GOOGLE_MAPS_MAP_ID` (if using WebGL renderer).
+
+```tsx
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useRouteReplay } from "@gm/route-replay-react"; // Assuming workspace link works
@@ -198,118 +205,18 @@ function App() {
         </button>
         <button
           onClick={controls.pause}
-          disabled={!state.isPlaying || !isMapApiLoaded}
+          // ... rest of the code ...
         >
-          {" "}
-          Pause{" "}
+          Pause
         </button>
-        <button onClick={controls.stop} disabled={!isMapApiLoaded}>
-          {" "}
-          Stop{" "}
-        </button>
+        {/* Add the rest of the App.tsx code here */}
       </div>
-
-      {/* Speed Controls Section */}
-      <div className="controls speed-controls">
-        <span>Speed: {state.speed.toFixed(1)}x</span>
-        <input
-          type="range"
-          min="0.25"
-          max="8"
-          step="0.25"
-          value={state.speed}
-          onChange={handleSpeedChange}
-          disabled={!isMapApiLoaded}
-          style={{
-            marginLeft: "10px",
-            marginRight: "10px",
-            verticalAlign: "middle",
-          }}
-        />
-        <button onClick={() => handleSetSpeed(0.5)} disabled={!isMapApiLoaded}>
-          0.5x
-        </button>
-        <button onClick={() => handleSetSpeed(1)} disabled={!isMapApiLoaded}>
-          1x
-        </button>
-        <button onClick={() => handleSetSpeed(2)} disabled={!isMapApiLoaded}>
-          2x
-        </button>
-        <button onClick={() => handleSetSpeed(4)} disabled={!isMapApiLoaded}>
-          4x
-        </button>
-      </div>
-
-      {/* Camera Mode Controls */}
-      <div className="controls camera-controls">
-        <span>Camera Mode:</span>
-        <label style={{ marginLeft: "10px" }}>
-          <input
-            type="radio"
-            name="cameraMode"
-            value="center"
-            checked={state.cameraMode === "center"}
-            onChange={handleCameraModeChange}
-            disabled={!isMapApiLoaded}
-          />{" "}
-          Center
-        </label>
-        <label style={{ marginLeft: "10px" }}>
-          <input
-            type="radio"
-            name="cameraMode"
-            value="ahead"
-            checked={state.cameraMode === "ahead"}
-            onChange={handleCameraModeChange}
-            disabled={!isMapApiLoaded}
-          />{" "}
-          Ahead
-        </label>
-        <label style={{ marginLeft: "10px" }}>
-          <input
-            type="radio"
-            name="cameraMode"
-            value="none"
-            checked={state.cameraMode === "none"}
-            onChange={handleCameraModeChange}
-            disabled={!isMapApiLoaded}
-          />{" "}
-          None
-        </label>
-      </div>
-
-      <div className="state">
-        {/* ... Status, Progress bar ... */}
-        <p>Status: {state.isPlaying ? "Playing" : "Paused/Stopped"}</p>
-        <p>Progress: {progressPercent}%</p>
-        <div className="progress-bar-container">
-          <div
-            className="progress-bar"
-            style={{ width: `${progressPercent}%` }}
-          ></div>
-        </div>
-      </div>
-
-      {/* Example of how you *might* display per-track info if state exposed it */}
-      {/* <div className="per-track-state">
-          {Object.keys(state.tracks || {}).map(trackId => (
-              <div key={trackId}>
-                  Track {trackId}: Progress {((state.tracks[trackId].progress || 0) * 100).toFixed(1)}%
-              </div>
-          ))}
-      </div> */}
-
-      <p>
-        <em>
-          Note: Ensure you have a valid <code>VITE_GOOGLE_MAPS_API_KEY</code>
-          {routeReplayOptions.rendererType === "webgl" &&
-            ", and a valid <code>VITE_GOOGLE_MAPS_MAP_ID</code>"}
-          in an <code>.env</code> file in the <code>examples/react-vite</code>{" "}
-          directory.
-        </em>
-      </p>
     </>
   );
 }
 
 export default App;
+
+```
+
+*(Note: The full code is longer, this includes the setup and main component structure)* 
