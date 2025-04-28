@@ -2,77 +2,134 @@
 
 interface PolylineRendererOptions {
   map: google.maps.Map;
-  polylineOptions?: google.maps.PolylineOptions;
+  polylineOptions?: google.maps.PolylineOptions; // Base options for all polylines
 }
 
 export class PolylineRenderer {
   private map: google.maps.Map;
-  private polyline: google.maps.Polyline | null = null;
-  private options: google.maps.PolylineOptions;
-  private currentPath: google.maps.LatLngLiteral[] = []; // Store the currently drawn path
+  private basePolylineOptions: google.maps.PolylineOptions;
+  private polylines = new Map<string, google.maps.Polyline>();
+  private currentPaths = new Map<string, google.maps.LatLngLiteral[]>();
 
   constructor({ map, polylineOptions }: PolylineRendererOptions) {
     this.map = map;
-    this.options = {
-      strokeColor: "#FF0000", // Keep red color from example
+    this.basePolylineOptions = {
+      strokeColor: "#FF0000",
       strokeOpacity: 0.8,
       strokeWeight: 4,
       clickable: false,
       ...(polylineOptions || {}),
+      path: [], // Path will be set per track
+      map: this.map, // Add to map, path is initially empty
     };
+    console.log("PolylineRenderer initialized for multi-track.");
+  }
 
-    this.polyline = new google.maps.Polyline({
-      ...this.options,
-      map: this.map,
-      path: [], // Start with empty path
-    });
-    console.log("PolylineRenderer initialized (dynamic path).");
+  private getOrCreatePolyline(trackId: string): google.maps.Polyline {
+    let polyline = this.polylines.get(trackId);
+    if (!polyline) {
+      polyline = new google.maps.Polyline({
+        ...this.basePolylineOptions,
+        // Consider allowing per-track options overrides here later
+      });
+      this.polylines.set(trackId, polyline);
+      this.currentPaths.set(trackId, []);
+      console.log(`Polyline created for track ${trackId}`);
+    }
+    return polyline;
   }
 
   /**
-   * Adds a new point to the end of the currently drawn polyline.
+   * Adds a new point to the end of the polyline for a specific track,
+   * only if it's different from the last point.
+   * @param trackId - Identifier for the track.
    * @param point - The LatLng literal to add.
    */
-  addPoint(point: google.maps.LatLngLiteral): void {
-    if (!this.polyline) return;
+  addPoint(trackId: string, point: google.maps.LatLngLiteral): void {
+    const polyline = this.getOrCreatePolyline(trackId);
+    const path = this.currentPaths.get(trackId) || [];
 
-    this.currentPath.push(point);
-    // Create a new array for setPath, modifying MVCArray in place can be less reliable sometimes
-    this.polyline.setPath([...this.currentPath]);
-    // console.log(`Polyline point added. Path length: ${this.currentPath.length}`); // Optional log
-  }
-
-  /**
-   * Resets the polyline path to be empty.
-   */
-  resetPath(): void {
-    this.currentPath = [];
-    if (this.polyline) {
-      this.polyline.setPath([]);
+    // Only add point if path is empty or the new point is different from the last point
+    const lastPoint = path.length > 0 ? path[path.length - 1] : null;
+    if (
+      !lastPoint ||
+      lastPoint.lat !== point.lat ||
+      lastPoint.lng !== point.lng
+    ) {
+      path.push(point);
+      this.currentPaths.set(trackId, path);
+      polyline.setPath([...path]); // Update the map only if the path actually changed
+      // console.log(`Polyline point added for track ${trackId}. New length: ${path.length}`);
+    } else {
+      // console.log(`Skipped adding duplicate point for track ${trackId}`);
     }
-    // console.log("Polyline path reset."); // Optional log
   }
 
   /**
-   * Sets the polyline path to a specific set of points (used for seeking).
+   * Resets the polyline path to be empty for a specific track.
+   * @param trackId - Identifier for the track.
+   */
+  resetPath(trackId: string): void {
+    const polyline = this.polylines.get(trackId);
+    if (polyline) {
+      polyline.setPath([]);
+    }
+    this.currentPaths.set(trackId, []); // Reset internal state too
+    // console.log(`Polyline path reset for track ${trackId}`);
+  }
+
+  /**
+   * Resets the polyline paths for all tracks.
+   */
+  resetAllPaths(): void {
+    this.polylines.forEach((polyline) => polyline.setPath([]));
+    this.currentPaths.clear(); // Clear all internal paths
+    console.log("All polyline paths reset.");
+  }
+
+  /**
+   * Sets the polyline path for a specific track (used for seeking).
+   * @param trackId - Identifier for the track.
    * @param path - The path to set.
    */
-  setPath(path: google.maps.LatLngLiteral[]): void {
-    this.currentPath = [...path]; // Update internal state
-    if (this.polyline) {
-      this.polyline.setPath(this.currentPath);
-    }
-    // console.log(`Polyline path explicitly set to ${path.length} points.`); // Optional log
+  setPath(trackId: string, path: google.maps.LatLngLiteral[]): void {
+    const polyline = this.getOrCreatePolyline(trackId);
+    this.currentPaths.set(trackId, [...path]); // Update internal state
+    polyline.setPath([...path]);
   }
 
   /**
-   * Cleans up the polyline from the map.
+   * Removes the polyline for a specific track from the map.
+   * @param trackId - Identifier for the track.
+   */
+  removePath(trackId: string): void {
+    const polyline = this.polylines.get(trackId);
+    if (polyline) {
+      polyline.setMap(null);
+      this.polylines.delete(trackId);
+      this.currentPaths.delete(trackId);
+      console.log(`Polyline removed for track ${trackId}`);
+    }
+  }
+
+  /**
+   * Removes all polylines managed by this renderer from the map.
+   */
+  removeAllPaths(): void {
+    this.polylines.forEach((polyline, trackId) => {
+      polyline.setMap(null);
+      // console.log(`Removing polyline for track ${trackId}`);
+    });
+    this.polylines.clear();
+    this.currentPaths.clear();
+    console.log("All polylines removed.");
+  }
+
+  /**
+   * Cleans up all polylines.
    */
   destroy(): void {
-    if (this.polyline) {
-      this.polyline.setMap(null);
-      this.polyline = null;
-      console.log("PolylineRenderer destroyed.");
-    }
+    this.removeAllPaths();
+    console.log("PolylineRenderer destroyed.");
   }
 }
