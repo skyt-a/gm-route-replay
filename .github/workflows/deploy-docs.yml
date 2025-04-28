@@ -34,11 +34,11 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10 # あなたの pnpm バージョンに合わせてください
+          version: 9
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20 # あなたの Node.js バージョンに合わせてください
+          node-version: 20
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
