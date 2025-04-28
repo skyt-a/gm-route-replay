@@ -1,0 +1,44 @@
+{
+  "name": "@gm/route-replay-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Core playback logic for gm-route-replay",
+  "keywords": [
+    "google-maps",
+    "gps",
+    "route",
+    "replay",
+    "playback",
+    "animation"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup --watch"
+  },
+  "peerDependencies": {
+    "@types/google.maps": "^3.58.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "types": ["node"]
+  },
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/react" },
+    { "path": "./packages/loader-gpx" },
+    { "path": "./packages/loader-geojson" }
+  ],
+  "include": ["packages/*/src/**/*", "tsup.config.ts", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

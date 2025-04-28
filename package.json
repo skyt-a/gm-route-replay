@@ -1,0 +1,35 @@
+{
+  "name": "gm-route-replay",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "build:core": "pnpm --filter=@gm/route-replay-core build",
+    "build:react": "pnpm --filter=@gm/route-replay-react build",
+    "dev:core": "pnpm --filter=@gm/route-replay-core dev",
+    "dev:react": "pnpm --filter=@gm/route-replay-react dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.4.1",
+  "devDependencies": {
+    "@types/google.maps": "^3.58.1",
+    "@types/node": "^22.15.3",
+    "@types/react": "^19.1.2",
+    "react": "^19.1.0",
+    "tsup": "^8.4.0",
+    "turbo": "^2.5.2",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.1",
+    "vitest": "^3.1.2"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
