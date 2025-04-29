@@ -86,7 +86,6 @@ const polylineOptionsConfig: google.maps.PolylineOptions = {
 function App() {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
-  const mapContainerRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [error, setError] = useState<string | null>(null);
   const replayHandleRef = useRef<RouteReplayHandle>(null);
@@ -98,6 +97,7 @@ function App() {
   const [durationMs, setDurationMs] = useState(0); // Will be calculated by core
   const [currentCameraMode, setCurrentCameraMode] =
     useState<CameraMode>("center");
+  const [isSeeking, setIsSeeking] = useState(false); // <-- Add isSeeking state
 
   // Effect to handle map loading and initialization (similar to before)
   useEffect(() => {
@@ -137,13 +137,16 @@ function App() {
   }, [apiKey, mapId, mapInstance]);
 
   // --- Event Handlers for <RouteReplay> Component ---
-  const handleFrame: PlayerEventMap["frame"] = useCallback((payload) => {
-    // Update progress based on the event from the component
-    // Note: The payload structure might differ from the hook's state.
-    // Adjust based on the actual event payload from GmRouteReplayOverlay.
-    setProgress(payload.progress);
-    // console.log("[App] Frame event:", payload);
-  }, []);
+  const handleFrame: PlayerEventMap["frame"] = useCallback(
+    (payload) => {
+      // Only update progress from frame event if user is not actively seeking
+      if (!isSeeking) {
+        setProgress(payload.progress);
+      }
+      // console.log("[App] Frame event:", payload);
+    },
+    [isSeeking]
+  ); // <-- Add isSeeking to dependency array
 
   const handleStart = useCallback(() => {
     console.log("[App] Start event");
@@ -162,13 +165,15 @@ function App() {
         setDurationMs(currentDuration);
       }
 
-      // Update progress based on seek time and current duration
-      const newProgress =
-        currentDuration > 0 ? payload.timeMs / currentDuration : 0;
-      setProgress(Math.min(1, Math.max(0, newProgress)));
+      // Only update progress from seek event if user is not actively seeking
+      if (!isSeeking) {
+        const newProgress =
+          currentDuration > 0 ? payload.timeMs / currentDuration : 0;
+        setProgress(Math.min(1, Math.max(0, newProgress)));
+      }
     },
-    [durationMs]
-  ); // Depend on durationMs to avoid infinite loop if getDurationMs is called in effect
+    [durationMs, isSeeking] // <-- Add isSeeking to dependency array
+  );
 
   const handleFinish = useCallback(() => {
     console.log("[App] Finish event");
@@ -185,6 +190,7 @@ function App() {
   // --- Control Callbacks using the ref ---
   const handlePlay = useCallback(() => {
     replayHandleRef.current?.play();
+    setIsPlaying(false);
   }, []);
   const handlePauseControl = useCallback(() => {
     replayHandleRef.current?.pause();
@@ -221,6 +227,34 @@ function App() {
     []
   );
 
+  // --- NEW: Seek Bar Handlers ---
+  const handleSeekInput = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setIsSeeking(true); // Set seeking flag
+      const newProgress = parseFloat(event.target.value);
+      setProgress(newProgress); // Update local progress state immediately for visual feedback
+      // Note: We call the actual seek in handleSeekChange (on mouse up)
+      // Or we could call it here if we want live seeking during drag:
+      // if (durationMs > 0 && replayHandleRef.current) {
+      //   replayHandleRef.current.seek(newProgress * durationMs);
+      // }
+    },
+    [] // No dependencies needed for setting state
+  );
+
+  const handleSeekChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newProgress = parseFloat(event.target.value);
+      if (durationMs > 0 && replayHandleRef.current) {
+        console.log(`[App] User seek to progress: ${newProgress}`);
+        replayHandleRef.current.seek(newProgress * durationMs);
+      }
+      setIsSeeking(false); // Unset seeking flag after user finishes
+    },
+    [durationMs] // Need durationMs to calculate seek time
+  );
+  // --- END NEW: Seek Bar Handlers ---
+
   // Effect to get duration from the overlay once available (if needed)
   // This assumes the overlay instance or its state provides duration. Example:
   // useEffect(() => {
@@ -234,7 +268,7 @@ function App() {
 
   const progressPercent = (progress * 100).toFixed(1);
 
-  const isReady = !!mapInstance; // Component is ready when map is available
+  const isReady = !!mapInstance && durationMs > 0; // Consider ready only when duration is known
 
   // --- JSX return ---
   return (
@@ -243,13 +277,12 @@ function App() {
       <div
         id="map"
         style={{ height: "500px", width: "100%", marginBottom: "1rem" }}
-      >
-        {!mapInstance && <div>Loading Google Maps...</div>}
-      </div>
+      ></div>
 
       {/* Conditionally render RouteReplay only when map is ready */}
       {mapInstance && (
         <RouteReplay
+          ref={replayHandleRef}
           map={mapInstance}
           route={multiTrackRouteData}
           // Pass options as props
@@ -348,19 +381,31 @@ function App() {
         </label>
       </div>
 
-      <div className="controls progress-display">
+      {/* --- UPDATED: Progress Bar --- */}
+      <div className="controls progress-controls">
         <span>Progress: {progressPercent}%</span>
-        <progress
-          value={progress}
+        <input
+          type="range"
+          min="0"
           max="1"
-          style={{ marginLeft: "10px", width: "300px" }}
+          step="0.001" // Smaller step for smoother seeking
+          value={progress}
+          onInput={handleSeekInput} // Handle dragging
+          onChange={handleSeekChange} // Handle mouse up / change commit
+          disabled={!isReady}
+          style={{
+            marginLeft: "10px",
+            width: "400px",
+            verticalAlign: "middle",
+          }}
         />
-        {/* Need durationMs to display time */}
-        <span>
-          ({durationMs > 0 ? ((progress * durationMs) / 1000).toFixed(1) : "?"}s
-          / {durationMs > 0 ? (durationMs / 1000).toFixed(1) : "?"}s)
+        <span style={{ marginLeft: "10px" }}>
+          (
+          {durationMs > 0 ? ((progress * durationMs) / 1000).toFixed(1) : "0.0"}
+          s / {durationMs > 0 ? (durationMs / 1000).toFixed(1) : "0.0"}s)
         </span>
       </div>
+      {/* --- END UPDATED: Progress Bar --- */}
 
       <p>
         <em>
