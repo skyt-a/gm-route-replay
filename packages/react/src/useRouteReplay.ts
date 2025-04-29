@@ -1,8 +1,6 @@
 /// <reference types="@types/google.maps" />
 
 import { useState, useEffect, useRef, useCallback } from "react";
-// Assuming core is built and linked or using path aliases
-// Adjust the import path based on your monorepo setup (e.g., using tsconfig paths or relative paths after build)
 import {
   createPlayer,
   PlayerHandle,
@@ -14,7 +12,6 @@ import {
   CameraOptions,
 } from "gm-route-replay-core";
 
-// Re-define RouteInput locally to avoid export issues
 type LocalRouteInput =
   | RoutePoint[]
   | { [trackId: string]: RoutePoint[] }
@@ -24,21 +21,18 @@ type LocalRouteInput =
 // Explicitly include options from PlayerOptions that are needed,
 // plus the hook-specific ones.
 interface UseRouteReplayOptions {
-  // Core options (excluding map)
   route: LocalRouteInput;
   fps?: 60 | 30;
-  initialSpeed?: number; // Explicitly include from PlayerOptions
+  initialSpeed?: number;
   autoFit?: boolean;
   markerOptions?: google.maps.MarkerOptions;
   polylineOptions?: google.maps.PolylineOptions;
   interpolation?: "linear" | "spline";
-  plugins?: Plugin[]; // Make sure Plugin type is imported or defined if used
+  plugins?: Plugin[];
 
-  // Hook-specific options
   mapContainerRef: React.RefObject<HTMLDivElement | null>;
-  isMapApiLoaded?: boolean;
   cameraMode?: CameraMode;
-  mapId?: string; // ADDED: Optional Map ID for vector maps/WebGL features
+  mapId?: string;
 }
 
 interface RouteReplayState {
@@ -66,7 +60,7 @@ interface UseRouteReplayResult {
 export function useRouteReplay(
   options: UseRouteReplayOptions
 ): UseRouteReplayResult {
-  const { mapContainerRef, isMapApiLoaded, mapId, ...coreOptions } = options;
+  const { mapContainerRef, mapId } = options;
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const playerRef = useRef<PlayerHandle | null>(null);
   const optionsRef = useRef(options);
@@ -93,7 +87,6 @@ export function useRouteReplay(
   // Initialize map instance effect
   useEffect(() => {
     if (
-      isMapApiLoaded &&
       mapContainerRef.current &&
       !mapInstanceRef.current &&
       typeof google !== "undefined" &&
@@ -123,7 +116,7 @@ export function useRouteReplay(
     //     setIsMapInitialized(false);
     //   }
     // };
-  }, [isMapApiLoaded, mapContainerRef, mapId]); // Add mapId to dependencies
+  }, [mapContainerRef, mapId, google.maps]); // Add mapId to dependencies
 
   // Initialize and manage player instance effect
   useEffect(() => {
@@ -131,23 +124,15 @@ export function useRouteReplay(
     const currentOptions = optionsRef.current; // Use options from ref
 
     if (isMapInitialized && mapInstanceRef.current) {
-      console.log("Map initialized, attempting to create player...");
       try {
-        const {
-          mapContainerRef: _ref,
-          isMapApiLoaded: _loaded,
-          ...playerCoreOptions
-        } = currentOptions;
+        const { mapContainerRef: _ref, ...playerCoreOptions } = currentOptions;
 
-        // @ts-ignore Temporarily ignore type mismatch due to potential build/cache issues
         player = createPlayer({
           ...playerCoreOptions,
           map: mapInstanceRef.current,
         });
         playerRef.current = player;
-        console.log("Player instance created:", player);
 
-        // --- Calculate Global Duration from input route ---
         let calculatedDurationMs = 0;
         const routeInput = playerCoreOptions.route as LocalRouteInput;
         if (typeof routeInput === "string") {
@@ -162,14 +147,10 @@ export function useRouteReplay(
             );
           }
         } else if (typeof routeInput === "object" && routeInput !== null) {
-          // Explicit check for object and non-null
-          // Multi-track object
           let minTime = Infinity;
           let maxTime = -Infinity;
           let hasValidTrack = false;
-          // Now typescript should know routeInput is { [trackId: string]: RoutePoint[] }
           for (const trackId in routeInput) {
-            // Ensure hasOwnProperty check for safety
             if (Object.prototype.hasOwnProperty.call(routeInput, trackId)) {
               const track = routeInput[trackId];
               if (Array.isArray(track) && track.length >= 2) {
@@ -183,15 +164,11 @@ export function useRouteReplay(
           if (hasValidTrack) {
             calculatedDurationMs = Math.max(0, maxTime - minTime);
           }
-        } // Removed unnecessary 'else' block
-        console.log(
-          `[Hook] Global duration calculated: ${calculatedDurationMs}ms`
-        );
+        }
         setPlayerState((prevState) => ({
           ...prevState,
           durationMs: calculatedDurationMs,
         }));
-        // --- End Duration Calculation ---
 
         // --- Event Listeners (using calculatedDurationMs for seek) ---
         const handleFrame: PlayerEventMap["frame"] = (payload) => {
@@ -246,7 +223,6 @@ export function useRouteReplay(
       }
     }
 
-    // Cleanup function
     return () => {
       if (playerRef.current) {
         console.log("Hook: Destroying player instance due to cleanup...");
@@ -269,7 +245,6 @@ export function useRouteReplay(
     // If options (like route) change, we need to re-initialize the player.
   }, [isMapInitialized, options]); // Depend on map readiness and options object
 
-  // --- Control Functions --- (Memoized, dependencies might need playerRef)
   const play = useCallback(() => {
     playerRef.current?.play();
   }, []);
@@ -298,8 +273,6 @@ export function useRouteReplay(
 
   const setCameraMode = useCallback(
     (mode: CameraMode, camOptions?: CameraOptions) => {
-      console.log(`[Hook] Calling player.setCameraMode(${mode})`, camOptions);
-      // @ts-ignore Ignore potential method not found error due to build cache
       playerRef.current?.setCameraMode(mode, camOptions);
       setPlayerState((prevState) => ({
         ...prevState,
@@ -309,7 +282,6 @@ export function useRouteReplay(
     []
   );
 
-  // Log the controls object before returning
   const controlsObject = {
     play,
     pause,

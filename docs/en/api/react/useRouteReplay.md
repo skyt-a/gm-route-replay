@@ -1,7 +1,7 @@
 # useRouteReplay()
 
 A custom hook for easily implementing the route replay functionality in React applications.
-It wraps `@gm/route-replay-core`'s `createPlayer` and integrates it with React's state management and lifecycle.
+It wraps `gm-route-replay-core`'s `createPlayer` and integrates it with React's state management and lifecycle.
 
 ## Signature
 
@@ -11,7 +11,7 @@ import {
   CameraMode,
   CameraOptions,
   PlayerHandle
-} from '@gm/route-replay-core'; // Assuming types are accessible
+} from 'gm-route-replay-core'; // Assuming types are accessible
 
 interface UseRouteReplayOptions {
   // Core options (excluding map)
@@ -71,7 +71,7 @@ function useRouteReplay(options: UseRouteReplayOptions): UseRouteReplayResult;
 
 *   **`UseRouteReplayResult`** object:
     *   **`player`**: `PlayerHandle | null`
-        The underlying `@gm/route-replay-core` `PlayerHandle` instance created internally. Direct access is possible, but `controls` are typically used.
+        The underlying `gm-route-replay-core` `PlayerHandle` instance created internally. Direct access is possible, but `controls` are typically used.
     *   **`state`**: `RouteReplayState`
         An object containing the current state of the player.
         *   `isPlaying`: `boolean` - Whether playback is currently active.
@@ -92,8 +92,8 @@ function useRouteReplay(options: UseRouteReplayOptions): UseRouteReplayResult;
 ```tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { useRouteReplay } from '@gm/route-replay-react';
-import type { RouteInput } from '@gm/route-replay-core';
+import { useRouteReplay } from 'gm-route-replay-react';
+import type { RouteInput } from 'gm-route-replay-core';
 
 function MyMapComponent() {
   const mapContainerRef = useRef<HTMLDivElement>(null);

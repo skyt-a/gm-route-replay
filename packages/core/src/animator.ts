@@ -57,7 +57,6 @@ export class Animator {
 
     this.lastFrameTime = performance.now();
     this.animationFrameId = requestAnimationFrame(this.loop);
-    console.log(`Animator started at time ${this.currentTimelineTimeMs}ms`);
   }
 
   public pause(): void {
@@ -67,19 +66,16 @@ export class Animator {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
-    console.log(`Animator paused at time ${this.currentTimelineTimeMs}ms`);
   }
 
   public stop(): void {
     this.pause();
     this.currentTimelineTimeMs = 0;
     this.onFrameCallback = null;
-    console.log("Animator stopped (timeline reset)");
   }
 
   public destroy(): void {
     this.stop();
-    console.log("Animator destroyed");
   }
 
   private loop = (currentTime: number): void => {

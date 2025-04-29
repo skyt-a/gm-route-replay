@@ -1,7 +1,7 @@
 # useRouteReplay()
 
 React アプリケーションで簡単にルートリプレイ機能を実装するためのカスタムフックです。
-`@gm/route-replay-core` の `createPlayer` をラップし、React の状態管理とライフサイクルに統合します。
+`gm-route-replay-core` の `createPlayer` をラップし、React の状態管理とライフサイクルに統合します。
 
 ## シグネチャ
 
@@ -11,7 +11,7 @@ import {
   CameraMode,
   CameraOptions,
   PlayerHandle
-} from '@gm/route-replay-core'; // Assuming types are accessible
+} from 'gm-route-replay-core'; // Assuming types are accessible
 
 interface UseRouteReplayOptions {
   // Core options (excluding map)
@@ -71,7 +71,7 @@ function useRouteReplay(options: UseRouteReplayOptions): UseRouteReplayResult;
 
 *   **`UseRouteReplayResult`** オブジェクト:
     *   **`player`**: `PlayerHandle | null`
-        内部で作成された `@gm/route-replay-core` の `PlayerHandle` インスタンス。直接アクセスすることも可能ですが、通常は `controls` を使用します。
+        内部で作成された `gm-route-replay-core` の `PlayerHandle` インスタンス。直接アクセスすることも可能ですが、通常は `controls` を使用します。
     *   **`state`**: `RouteReplayState`
         現在のプレイヤーの状態を含むオブジェクト。
         *   `isPlaying`: `boolean` - 再生中かどうか。
@@ -92,8 +92,8 @@ function useRouteReplay(options: UseRouteReplayOptions): UseRouteReplayResult;
 ```tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { useRouteReplay } from '@gm/route-replay-react';
-import type { RouteInput } from '@gm/route-replay-core';
+import { useRouteReplay } from 'gm-route-replay-react';
+import type { RouteInput } from 'gm-route-replay-core';
 
 function MyMapComponent() {
   const mapContainerRef = useRef<HTMLDivElement>(null);

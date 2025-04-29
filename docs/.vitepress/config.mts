@@ -30,7 +30,7 @@ export default defineConfig({
             text: "API リファレンス",
             items: [
               {
-                text: "コアライブラリ (@gm/route-replay-core)",
+                text: "コアライブラリ (gm-route-replay-core)",
                 collapsed: false,
                 items: [
                   { text: "createPlayer", link: "/ja/api/core/createPlayer" },
@@ -43,7 +43,7 @@ export default defineConfig({
                 ],
               },
               {
-                text: "React Hook (@gm/route-replay-react)",
+                text: "React Hook (gm-route-replay-react)",
                 collapsed: false,
                 items: [
                   {
@@ -88,7 +88,7 @@ export default defineConfig({
             text: "API Reference",
             items: [
               {
-                text: "Core Library (@gm/route-replay-core)",
+                text: "Core Library (gm-route-replay-core)",
                 collapsed: false,
                 items: [
                   { text: "createPlayer", link: "/en/api/core/createPlayer" },
@@ -101,7 +101,7 @@ export default defineConfig({
                 ],
               },
               {
-                text: "React Hook (@gm/route-replay-react)",
+                text: "React Hook (gm-route-replay-react)",
                 collapsed: false,
                 items: [
                   {

@@ -7,8 +7,8 @@ Make sure you have a `.env` file in the `examples/react-vite` directory with you
 ```tsx
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
-import { useRouteReplay } from "@gm/route-replay-react"; // Assuming workspace link works
-import type { RoutePoint, RouteInput, CameraMode } from "@gm/route-replay-core";
+import { useRouteReplay } from "gm-route-replay-react"; // Assuming workspace link works
+import type { RoutePoint, RouteInput, CameraMode } from "gm-route-replay-core";
 import "./App.css";
 
 // --- Sample Data & Config (Outside Component) ---

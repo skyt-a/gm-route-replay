@@ -13,7 +13,6 @@ interface WebGLMarkerData {
   heading?: number; // Keep last known heading
   color: [number, number, number, number]; // RGBA color array (0.0 - 1.0)
   buffer: WebGLBuffer | null; // Buffer for this track's path vertices
-  // Add other properties like color, size later
 }
 
 // --- Line Shaders ---
@@ -124,17 +123,13 @@ export class WebGLOverlayRenderer implements IRenderer {
     this.overlayView.onContextRestored = this.onContextRestored.bind(this);
     this.overlayView.onDraw = this.onDraw.bind(this);
     this.overlayView.onRemove = this.onRemove.bind(this);
-    // REMOVED: this.overlayView.setMap(this.map);
-    console.log("WebGLOverlayRenderer initialized (for lines and points).");
   }
 
   mount(): void {
     if (!this.isMounted && this.overlayView && this.map) {
-      console.log("WebGLOverlayRenderer mounting... Map instance:", this.map);
       // Remove the delay, set map directly
       this.overlayView.setMap(this.map);
       this.isMounted = true;
-      console.log("WebGLOverlayRenderer mounted (overlayView set to map).");
     } else if (this.isMounted) {
       console.warn("WebGLOverlayRenderer already mounted.");
     } else {
@@ -150,7 +145,6 @@ export class WebGLOverlayRenderer implements IRenderer {
   }
 
   private onContextRestored({ gl }: google.maps.WebGLStateOptions): void {
-    console.log("WebGLOverlayView: onContextRestored");
     this.gl = gl;
     let success = true;
 
@@ -254,7 +248,6 @@ export class WebGLOverlayRenderer implements IRenderer {
     }
 
     if (success) {
-      console.log("WebGL resources (lines and points) created successfully.");
       this.requestRedraw();
     } else {
       console.error(
@@ -423,7 +416,6 @@ export class WebGLOverlayRenderer implements IRenderer {
   }
 
   private onRemove(): void {
-    console.log("WebGLOverlayView: onRemove");
     this.cleanupProgramsAndBuffers();
     this.gl = null;
   }
@@ -439,7 +431,6 @@ export class WebGLOverlayRenderer implements IRenderer {
     if (!this.colorMap.has(trackId)) {
       const newColor = generateColorForTrackId(trackId);
       this.colorMap.set(trackId, newColor);
-      console.log(`Assigned color ${newColor} to track ${trackId}`);
     }
     // Non-null assertion is safe because we just checked/set it
     return this.colorMap.get(trackId)!;
@@ -497,9 +488,6 @@ export class WebGLOverlayRenderer implements IRenderer {
         this.gl.deleteBuffer(data.buffer); // Delete the buffer associated with the track
       }
       this.markersData.delete(trackId);
-      console.log(
-        `WebGL Marker data (and path/buffer) removed for track ${trackId}`
-      );
       this.requestRedraw();
     }
   }
@@ -515,13 +503,11 @@ export class WebGLOverlayRenderer implements IRenderer {
       }
       this.markersData.clear();
       this.colorMap.clear();
-      console.log("All WebGL marker data (paths/buffers) cleared.");
       this.requestRedraw();
     }
   }
 
   destroy(): void {
-    console.log("Destroying WebGLOverlayRenderer...");
     // Ensure map is unset first to trigger onRemove if needed
     if (this.overlayView) {
       this.overlayView.setMap(null);
@@ -533,7 +519,6 @@ export class WebGLOverlayRenderer implements IRenderer {
     this.colorMap.clear();
     this.isMounted = false;
     this.gl = null; // Ensure GL context ref is cleared
-    console.log("WebGLOverlayRenderer destroyed.");
   }
 
   private cleanupProgramsAndBuffers(): void {

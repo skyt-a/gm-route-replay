@@ -27,10 +27,10 @@ For detailed API references and usage examples, please refer to the documentatio
 
 ```bash
 # Core Library
-pnpm add @gm/route-replay-core
+pnpm add gm-route-replay-core
 
 # React Hook (if using React)
-pnpm add @gm/route-replay-react
+pnpm add gm-route-replay-react
 ```
 
 ## Basic Usage (React Hook)
@@ -38,8 +38,8 @@ pnpm add @gm/route-replay-react
 ```tsx
 import React, { useRef, useState, useEffect } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { useRouteReplay } from '@gm/route-replay-react';
-import type { RouteInput } from '@gm/route-replay-core';
+import { useRouteReplay } from 'gm-route-replay-react';
+import type { RouteInput } from 'gm-route-replay-core';
 
 function MapComponent() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -108,9 +108,8 @@ If you are not using React, you can use the core library directly.
 </html>
 ```
 
-```javascript
-// core-example.js (or similar)
-import { createPlayer } from '@gm/route-replay-core';
+```javascript:core-example.js
+import { createPlayer } from 'gm-route-replay-core';
 
 let map;
 let player;
@@ -135,44 +134,16 @@ function initMap() {
     map: map,
     route: routeData,
     autoFit: true,
-    // rendererType: 'webgl', // Uncomment to use WebGL
-    // mapId: 'YOUR_MAP_ID',
+    rendererType: 'webgl', 
+    mapId: 'YOUR_MAP_ID',
   });
 
   document.getElementById('playBtn')?.addEventListener('click', () => player?.play());
   document.getElementById('pauseBtn')?.addEventListener('click', () => player?.pause());
 }
 
-// Make initMap globally accessible
 window.initMap = initMap;
 ```
-
-## Development
-
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/skyt-a/gm-route-replay.git
-    cd gm-route-replay
-    ```
-2.  **Install dependencies:**
-    ```bash
-    pnpm install
-    ```
-3.  **Start development servers:**
-    ```bash
-    # Build/watch all packages
-    pnpm dev
-
-    # Documentation site dev server
-    pnpm docs:dev
-
-    # React sample dev server (examples/react-vite)
-    cd examples/react-vite
-    # Set API key in .env file
-    cp .env.example .env
-    # Start server
-    pnpm dev
-    ```
 
 ## License
 

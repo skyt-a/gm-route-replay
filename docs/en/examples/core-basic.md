@@ -1,6 +1,6 @@
 # Core Library Example
 
-This page shows a basic usage example using the core `@gm/route-replay-core` library directly, without React.
+This page shows a basic usage example using the core `gm-route-replay-core` library directly, without React.
 
 ## HTML Setup
 
@@ -41,7 +41,7 @@ You'll need a basic HTML file to host the map and controls:
 Create a JavaScript file (e.g., `core-example.js`) to initialize the map and the player:
 
 ```javascript
-import { createPlayer } from '@gm/route-replay-core';
+import { createPlayer } from 'gm-route-replay-core';
 
 let map;
 let player;

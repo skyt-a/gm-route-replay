@@ -5,7 +5,7 @@ The `createPlayer` function is the main entry point for the route replay functio
 ## Signature
 
 ```typescript
-import { PlayerOptions, PlayerHandle } from '@gm/route-replay-core';
+import { PlayerOptions, PlayerHandle } from 'gm-route-replay-core';
 
 function createPlayer(options: PlayerOptions): PlayerHandle;
 ```
@@ -23,7 +23,7 @@ function createPlayer(options: PlayerOptions): PlayerHandle;
 ## Usage Example
 
 ```typescript
-import { createPlayer } from '@gm/route-replay-core';
+import { createPlayer } from 'gm-route-replay-core';
 
 const map = new google.maps.Map(document.getElementById('map'), { /* ... map options ... */ });
 

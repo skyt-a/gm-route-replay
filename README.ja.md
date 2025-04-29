@@ -27,10 +27,10 @@ WebGLOverlayView を利用した高パフォーマンスなレンダリングと
 
 ```bash
 # コアライブラリ
-pnpm add @gm/route-replay-core
+pnpm add gm-route-replay-core
 
 # React Hook (React を使用する場合)
-pnpm add @gm/route-replay-react
+pnpm add gm-route-replay-react
 ```
 
 ## 基本的な使い方 (React Hook)
@@ -38,16 +38,15 @@ pnpm add @gm/route-replay-react
 ```tsx
 import React, { useRef, useState, useEffect } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { useRouteReplay } from '@gm/route-replay-react';
-import type { RouteInput } from '@gm/route-replay-core';
+import { useRouteReplay } from 'gm-route-replay-react';
+import type { RouteInput } from 'gm-route-replay-core';
 
 function MapComponent() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
-  const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with your API key
-  const mapId = 'YOUR_MAP_ID'; // Optional: Required for WebGL renderer
+  const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
+  const mapId = 'YOUR_MAP_ID'; 
 
-  // Load Google Maps API
   useEffect(() => {
     const loader = new Loader({ apiKey, version: 'weekly', libraries: ['maps'] });
     loader.load().then(() => setIsMapApiLoaded(true));
@@ -108,14 +107,12 @@ React を使用しない場合は、コアライブラリを直接利用でき�
 </html>
 ```
 
-```javascript
-// core-example.js (or similar)
-import { createPlayer } from '@gm/route-replay-core';
+```javascript: core-example.js
+import { createPlayer } from 'gm-route-replay-core';
 
 let map;
 let player;
 
-// This function is called by the Google Maps script load
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 35.68, lng: 139.76 },
@@ -135,15 +132,14 @@ function initMap() {
     map: map,
     route: routeData,
     autoFit: true,
-    // rendererType: 'webgl', // Uncomment to use WebGL
-    // mapId: 'YOUR_MAP_ID',
+    rendererType: 'webgl',
+    mapId: 'YOUR_MAP_ID',
   });
 
   document.getElementById('playBtn')?.addEventListener('click', () => player?.play());
   document.getElementById('pauseBtn')?.addEventListener('click', () => player?.pause());
 }
 
-// Make initMap globally accessible
 window.initMap = initMap;
 ```
 
@@ -176,4 +172,4 @@ window.initMap = initMap;
 
 ## ライセンス
 
-[ISC](./LICENSE) (package.json に基づく - 必要であれば LICENSE ファイルを作成してください) 
+[ISC](./LICENSE)

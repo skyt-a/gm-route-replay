@@ -1,6 +1,6 @@
 # コアライブラリ使用例
 
-このページは、React を使わずに、コアライブラリ `@gm/route-replay-core` を直接使用する基本的な例を示します。
+このページは、React を使わずに、コアライブラリ `gm-route-replay-core` を直接使用する基本的な例を示します。
 
 ## HTML の準備
 
@@ -41,7 +41,7 @@
 マップとプレイヤーを初期化するための JavaScript ファイル（例: `core-example.js`）を作成します。
 
 ```javascript
-import { createPlayer } from '@gm/route-replay-core';
+import { createPlayer } from 'gm-route-replay-core';
 
 let map;
 let player;
