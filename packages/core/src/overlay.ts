@@ -486,8 +486,8 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
   private handleFinish(): void {
     console.log("GmRouteReplayOverlay: Playback finished.");
     this.animator?.pause(); // Ensure animator stops
-    // Ensure markers are at their final positions
-    this.updateRenderersAtTime(this.globalDurationMs);
+    // Ensure markers are at their final positions using the absolute end time
+    this.updateRenderersAtTime(this.globalEndTimeMs); // Use absolute end time
     this.triggerEvent("finish", undefined);
   }
 
