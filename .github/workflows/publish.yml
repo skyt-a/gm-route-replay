@@ -1,0 +1,47 @@
+name: Publish Packages to npm
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # Trigger on version tags like v1.0.0
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # id-token: write # Uncomment if using OIDC for provenance
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9 # Specify your pnpm version
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # Specify your Node.js version
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        # Assumes the root build script builds both packages.
+        # If not, use: pnpm run build --filter gm-route-replay-core --filter gm-route-replay-react
+        run: pnpm run build
+
+      # - name: Generate npm provenance # Optional: enhances security by linking build to package
+      #   uses: actions/attest-build-provenance@v1
+      #   with:
+      #     subject-path: 'packages/*/*.tgz' # Adjust if build outputs tgz files directly
+
+      - name: Publish packages to npm
+        # If build step doesn't output to root node_modules, use --filter like in build step
+        run: pnpm publish --filter gm-route-replay-core --filter gm-route-replay-react --no-git-checks --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
