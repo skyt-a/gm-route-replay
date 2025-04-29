@@ -1,24 +1,46 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { WebGLOverlayRenderer } from "./webgl";
 
-const mockWebGLOverlayViewInstance = {
-  onAdd: vi.fn(),
-  onContextRestored: vi.fn(),
-  onDraw: vi.fn(),
-  onRemove: vi.fn(),
-  setMap: vi.fn(),
-  requestRedraw: vi.fn(),
-};
-const mockWebGLOverlayView = vi.fn(() => mockWebGLOverlayViewInstance);
+const mockLatLng = (lat: number, lng: number): google.maps.LatLng => ({
+  lat: () => lat,
+  lng: () => lng,
+  equals: vi.fn(),
+  toJSON: vi.fn(() => ({ lat, lng })),
+  toUrlValue: vi.fn(() => `${lat},${lng}`),
+});
+
+let capturedRendererMethods: {
+  onAdd?: (...args: any[]) => void;
+  onContextRestored?: (options: google.maps.WebGLStateOptions) => void;
+  onDraw?: (options: google.maps.WebGLDrawOptions) => void;
+  onRemove?: (...args: any[]) => void;
+  setMap: ReturnType<typeof vi.fn>;
+  requestRedraw: ReturnType<typeof vi.fn>;
+} | null = null;
+
+const mockWebGLOverlayView = vi.fn().mockImplementation(() => {
+  capturedRendererMethods = {
+    setMap: vi.fn(),
+    requestRedraw: vi.fn(),
+  };
+  return capturedRendererMethods;
+});
 
 const mockMapInstance = {};
 
 const mockTransformer = {
   fromLatLngAltitude: vi.fn((pos: google.maps.LatLngAltitudeLiteral) => {
-    return [pos.lat * 1000, pos.lng * 1000, pos.altitude || 0];
+    const coords = [pos.lat * 1000, pos.lng * 1000, pos.altitude || 0];
+    return new Float64Array(coords);
   }),
+  getCameraParams: vi.fn(() => ({
+    center: mockLatLng(0, 0),
+    heading: 0,
+    tilt: 0,
+    zoom: 1,
+  })),
 
-  Fg: new Float32Array(16).fill(1),
+  Fg: new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]),
 };
 
 const mockPointOriginBuffer = { mockBuffer: true, id: "pointOrigin" };
@@ -72,6 +94,24 @@ interface MockGLContext {
     program: WebGLProgram,
     name: string
   ) => WebGLUniformLocation | null;
+
+  readonly COMPILE_STATUS: 0x8b81;
+  readonly LINK_STATUS: 0x8b82;
+  readonly VERTEX_SHADER: 0x8b31;
+  readonly FRAGMENT_SHADER: 0x8b30;
+  readonly ARRAY_BUFFER: 0x8892;
+  readonly STATIC_DRAW: 0x88e4;
+  readonly DYNAMIC_DRAW: 0x88e8;
+  readonly FLOAT: 0x1406;
+  readonly COLOR_BUFFER_BIT: 0x00004000;
+  readonly POINTS: 0x0000;
+  readonly LINE_STRIP: 0x0003;
+  readonly DELETE_STATUS: 0x8b80;
+  readonly VALIDATE_STATUS: 0x8b83;
+  readonly SHADER_TYPE: 0x8b4f;
+  readonly ATTACHED_SHADERS: 0x8b85;
+  readonly ACTIVE_ATTRIBUTES: 0x8b89;
+  readonly ACTIVE_UNIFORMS: 0x8b86;
 }
 
 const mockLineProgram = { mockProgram: true, type: "line" } as WebGLProgram;
@@ -83,10 +123,19 @@ const mockGlContext: MockGLContext = {
   shaderSource: vi.fn(),
   compileShader: vi.fn(),
   getShaderParameter: vi.fn((shader, pname) => {
-    if (pname === 0x8b81) return true;
+    if (pname === 0x8b81) {
+      return true;
+    }
+    if (pname === 0x8b80) {
+      return false;
+    }
+    if (pname === 0x8b4f) {
+      return 0x8b31;
+    }
+
     return null;
   }),
-  getShaderInfoLog: vi.fn(() => "mock shader info log"),
+  getShaderInfoLog: vi.fn(() => null),
   createProgram: vi.fn(() => {
     programCount++;
 
@@ -95,13 +144,20 @@ const mockGlContext: MockGLContext = {
   attachShader: vi.fn(),
   linkProgram: vi.fn(),
   getProgramParameter: vi.fn((program, pname) => {
-    if (pname === 0x8b82) return true;
+    if (pname === 0x8b82) {
+      return true;
+    }
+    if (pname === 0x8b80 || pname === 0x8b83) {
+      return false;
+    }
+    if (pname === 0x8b85 || pname === 0x8b89 || pname === 0x8b86) {
+      return 0;
+    }
+
     return null;
   }),
-  getProgramInfoLog: vi.fn(() => "mock program info log"),
-  createBuffer: vi.fn(
-    () => ({ mockBuffer: true, id: `buffer-${Math.random()}` } as WebGLBuffer)
-  ),
+  getProgramInfoLog: vi.fn(() => null),
+  createBuffer: vi.fn(),
   bindBuffer: vi.fn(),
   bufferData: vi.fn(),
   deleteShader: vi.fn(),
@@ -145,6 +201,24 @@ const mockGlContext: MockGLContext = {
   uniformMatrix4fv: vi.fn(),
   uniform4fv: vi.fn(),
   drawArrays: vi.fn(),
+
+  COMPILE_STATUS: 0x8b81,
+  LINK_STATUS: 0x8b82,
+  VERTEX_SHADER: 0x8b31,
+  FRAGMENT_SHADER: 0x8b30,
+  ARRAY_BUFFER: 0x8892,
+  STATIC_DRAW: 0x88e4,
+  DYNAMIC_DRAW: 0x88e8,
+  FLOAT: 0x1406,
+  COLOR_BUFFER_BIT: 0x00004000,
+  POINTS: 0x0000,
+  LINE_STRIP: 0x0003,
+  DELETE_STATUS: 0x8b80,
+  VALIDATE_STATUS: 0x8b83,
+  SHADER_TYPE: 0x8b4f,
+  ATTACHED_SHADERS: 0x8b85,
+  ACTIVE_ATTRIBUTES: 0x8b89,
+  ACTIVE_UNIFORMS: 0x8b86,
 };
 
 if (typeof global !== "undefined" && !(global as any).google) {
@@ -166,16 +240,19 @@ if (typeof global !== "undefined" && !(global as any).google) {
 describe("WebGLOverlayRenderer", () => {
   let renderer: WebGLOverlayRenderer;
   let mapMock: google.maps.Map;
+  let bufferIdCounter: number;
 
   beforeEach(() => {
     vi.clearAllMocks();
     programCount = 0;
+    capturedRendererMethods = null;
+    bufferIdCounter = 0;
 
-    let bufferIdCounter = 0;
-    mockGlContext.createBuffer = vi.fn(
-      () =>
-        ({ mockBuffer: true, id: `buffer-${bufferIdCounter++}` } as WebGLBuffer)
-    );
+    mockGlContext.createBuffer = vi.fn(() => {
+      const id = `buffer-${bufferIdCounter++}`;
+
+      return { mockBuffer: true, id: id } as WebGLBuffer;
+    });
 
     vi.stubGlobal("google", {
       maps: {
@@ -195,30 +272,37 @@ describe("WebGLOverlayRenderer", () => {
 
   it("should initialize WebGLOverlayView and bind lifecycle methods", () => {
     expect(mockWebGLOverlayView).toHaveBeenCalledTimes(1);
-    expect(mockWebGLOverlayViewInstance.onAdd).toBeInstanceOf(Function);
-    expect(mockWebGLOverlayViewInstance.onContextRestored).toBeInstanceOf(
+
+    expect(capturedRendererMethods).not.toBeNull();
+    expect((renderer as any).overlayView.onAdd).toBeInstanceOf(Function);
+    expect((renderer as any).overlayView.onContextRestored).toBeInstanceOf(
       Function
     );
-    expect(mockWebGLOverlayViewInstance.onDraw).toBeInstanceOf(Function);
-    expect(mockWebGLOverlayViewInstance.onRemove).toBeInstanceOf(Function);
-    expect(mockWebGLOverlayViewInstance.setMap).not.toHaveBeenCalled();
+    expect((renderer as any).overlayView.onDraw).toBeInstanceOf(Function);
+    expect((renderer as any).overlayView.onRemove).toBeInstanceOf(Function);
+
+    expect(capturedRendererMethods?.setMap).not.toHaveBeenCalled();
   });
 
   it("mount should call overlayView.setMap", () => {
     renderer.mount();
-    expect(mockWebGLOverlayViewInstance.setMap).toHaveBeenCalledTimes(1);
-    expect(mockWebGLOverlayViewInstance.setMap).toHaveBeenCalledWith(mapMock);
+    expect(capturedRendererMethods?.setMap).toHaveBeenCalledTimes(1);
+    expect(capturedRendererMethods?.setMap).toHaveBeenCalledWith(mapMock);
   });
 
   it("mount should be idempotent", () => {
     renderer.mount();
     renderer.mount();
-    expect(mockWebGLOverlayViewInstance.setMap).toHaveBeenCalledTimes(1);
+    expect(capturedRendererMethods?.setMap).toHaveBeenCalledTimes(1);
   });
 
   it("onContextRestored should compile shaders, link programs, get locations, and create buffers", () => {
+    if (!capturedRendererMethods?.onContextRestored) {
+      throw new Error("onContextRestored method not captured");
+    }
     const glOptions = { gl: mockGlContext as unknown as WebGLRenderingContext };
-    mockWebGLOverlayViewInstance.onContextRestored(glOptions);
+
+    capturedRendererMethods.onContextRestored(glOptions);
 
     expect(mockGlContext.createShader).toHaveBeenCalledTimes(4);
     expect(mockGlContext.compileShader).toHaveBeenCalledTimes(4);
@@ -252,16 +336,16 @@ describe("WebGLOverlayRenderer", () => {
 
     expect(mockGlContext.createBuffer).toHaveBeenCalledTimes(1);
     expect(mockGlContext.bindBuffer).toHaveBeenCalledWith(
-      WebGLRenderingContext.ARRAY_BUFFER,
+      0x8892,
       expect.objectContaining({ mockBuffer: true })
     );
     expect(mockGlContext.bufferData).toHaveBeenCalledWith(
-      WebGLRenderingContext.ARRAY_BUFFER,
+      0x8892,
       expect.any(Float32Array),
-      WebGLRenderingContext.STATIC_DRAW
+      0x88e4
     );
 
-    expect(mockWebGLOverlayViewInstance.requestRedraw).toHaveBeenCalled();
+    expect(capturedRendererMethods.requestRedraw).toHaveBeenCalled();
   });
 
   it("updateMarker should add new data with path and color, and clear buffer", () => {
@@ -288,12 +372,15 @@ describe("WebGLOverlayRenderer", () => {
     expect(markerData.heading).toBe(180);
     expect(markerData.buffer).toBeNull();
 
-    expect(mockWebGLOverlayViewInstance.requestRedraw).toHaveBeenCalledTimes(2);
+    expect(capturedRendererMethods?.requestRedraw).toHaveBeenCalledTimes(2);
   });
 
   it("onDraw should call GL methods for lines and points", () => {
+    if (!capturedRendererMethods?.onContextRestored) {
+      throw new Error("onContextRestored method not captured for setup");
+    }
     const glOptions = { gl: mockGlContext as unknown as WebGLRenderingContext };
-    mockWebGLOverlayViewInstance.onContextRestored(glOptions);
+    capturedRendererMethods.onContextRestored(glOptions);
 
     const trackId = "track1";
     renderer.updateMarker(trackId, { lat: 1, lng: 1 });
@@ -304,32 +391,36 @@ describe("WebGLOverlayRenderer", () => {
       gl: mockGlContext as unknown as WebGLRenderingContext,
       transformer: mockTransformer,
     };
-    mockWebGLOverlayViewInstance.onDraw(drawOptions);
 
-    expect(mockGlContext.useProgram).toHaveBeenCalledWith(
-      expect.objectContaining({ mockProgram: true })
-    );
+    if (!capturedRendererMethods?.onDraw) {
+      throw new Error("onDraw method not captured for setup");
+    }
+    capturedRendererMethods.onDraw(drawOptions);
+
+    expect(mockGlContext.useProgram).toHaveBeenCalledWith(mockLineProgram);
+
+    const expectedMatrix = expect.any(Float32Array);
     expect(mockGlContext.uniformMatrix4fv).toHaveBeenCalledWith(
       expect.objectContaining({ id: "vpMatrixLoc" }),
       false,
-      mockTransformer.Fg
+      expectedMatrix
     );
 
     expect(mockGlContext.createBuffer).toHaveBeenCalledTimes(1 + 1);
     expect(mockGlContext.bindBuffer).toHaveBeenCalledWith(
-      WebGLRenderingContext.ARRAY_BUFFER,
+      0x8892,
       expect.anything()
     );
     expect(mockGlContext.bufferData).toHaveBeenCalledWith(
-      WebGLRenderingContext.ARRAY_BUFFER,
+      0x8892,
       expect.any(Float32Array),
-      WebGLRenderingContext.DYNAMIC_DRAW
+      0x88e8
     );
 
     expect(mockGlContext.vertexAttribPointer).toHaveBeenCalledWith(
       1,
       3,
-      WebGLRenderingContext.FLOAT,
+      0x1406,
       false,
       0,
       0
@@ -339,23 +430,17 @@ describe("WebGLOverlayRenderer", () => {
       expect.any(Array)
     );
 
-    expect(mockGlContext.drawArrays).toHaveBeenCalledWith(
-      WebGLRenderingContext.LINE_STRIP,
-      0,
-      3
-    );
+    expect(mockGlContext.drawArrays).toHaveBeenCalledWith(0x0003, 0, 3);
 
-    expect(mockGlContext.useProgram).toHaveBeenCalledWith(
-      expect.objectContaining({ mockProgram: true })
-    );
+    expect(mockGlContext.useProgram).toHaveBeenCalledWith(mockPointProgram);
     expect(mockGlContext.bindBuffer).toHaveBeenCalledWith(
-      WebGLRenderingContext.ARRAY_BUFFER,
-      expect.objectContaining({ mockBuffer: true })
+      0x8892,
+      expect.objectContaining({ mockBuffer: true, id: "buffer-0" })
     );
     expect(mockGlContext.vertexAttribPointer).toHaveBeenCalledWith(
       2,
       3,
-      WebGLRenderingContext.FLOAT,
+      0x1406,
       false,
       0,
       0
@@ -366,6 +451,7 @@ describe("WebGLOverlayRenderer", () => {
       lng: 3,
       altitude: 0,
     });
+
     expect(mockGlContext.uniformMatrix4fv).toHaveBeenCalledWith(
       expect.objectContaining({ id: "mvpMatrixLoc" }),
       false,
@@ -376,97 +462,108 @@ describe("WebGLOverlayRenderer", () => {
       expect.any(Array)
     );
 
-    expect(mockGlContext.drawArrays).toHaveBeenCalledWith(
-      WebGLRenderingContext.POINTS,
-      0,
-      1
-    );
+    expect(mockGlContext.drawArrays).toHaveBeenCalledWith(0x0000, 0, 1);
   });
 
   it("destroy should cleanup GL resources and clear data", () => {
+    if (!capturedRendererMethods?.onContextRestored) {
+      throw new Error("onContextRestored method not captured for setup");
+    }
     const glOptions = { gl: mockGlContext as unknown as WebGLRenderingContext };
-    const pointOriginBufferMock = { mockBuffer: true, id: "pointOriginBuffer" };
-    const createBufferSpy = vi.spyOn(mockGlContext, "createBuffer");
-    createBufferSpy.mockReturnValueOnce(pointOriginBufferMock);
-    mockWebGLOverlayViewInstance.onContextRestored(glOptions);
-    createBufferSpy.mockRestore();
-    expect((renderer as any).pointOriginBuffer).toBe(pointOriginBufferMock);
+    capturedRendererMethods.onContextRestored(glOptions);
+    const expectedPointOriginBuffer = { mockBuffer: true, id: "buffer-0" };
+    expect((renderer as any).pointOriginBuffer).toEqual(
+      expectedPointOriginBuffer
+    );
 
     renderer.updateMarker("track1", { lat: 1, lng: 1 });
 
-    const trackBufferMock = { mockBuffer: true, id: "track1Buffer" };
-    const createBufferSpy2 = vi.spyOn(mockGlContext, "createBuffer");
-    createBufferSpy2.mockReturnValueOnce(trackBufferMock);
+    renderer.updateMarker("track1", { lat: 1.1, lng: 1.1 });
+
+    if (!capturedRendererMethods?.onDraw) {
+      throw new Error("onDraw method not captured for setup");
+    }
     const drawOptions = {
       gl: mockGlContext as unknown as WebGLRenderingContext,
       transformer: mockTransformer,
     };
-    mockWebGLOverlayViewInstance.onDraw(drawOptions);
-    createBufferSpy2.mockRestore();
+    capturedRendererMethods.onDraw(drawOptions);
+    const expectedTrackBuffer = { mockBuffer: true, id: "buffer-1" };
     const markerData = (renderer as any).markersData.get("track1");
-    expect(markerData.buffer).toBe(trackBufferMock);
+    expect(markerData.buffer).toEqual(expectedTrackBuffer);
 
     renderer.destroy();
 
-    expect(mockGlContext.deleteBuffer).toHaveBeenCalledWith(trackBufferMock);
-    expect(mockGlContext.deleteBuffer).toHaveBeenCalledWith(
-      pointOriginBufferMock
-    );
     expect(mockGlContext.deleteBuffer).toHaveBeenCalledTimes(2);
+    expect(mockGlContext.deleteBuffer).toHaveBeenCalledWith(
+      expectedPointOriginBuffer
+    );
+    expect(mockGlContext.deleteBuffer).toHaveBeenCalledWith(
+      expectedTrackBuffer
+    );
     expect(mockGlContext.deleteProgram).toHaveBeenCalledTimes(2);
     expect((renderer as any).markersData.size).toBe(0);
     expect((renderer as any).colorMap.size).toBe(0);
   });
 
   it("removeMarker should delete data and specific buffer", () => {
+    if (!capturedRendererMethods?.onContextRestored) {
+      throw new Error("onContextRestored method not captured for setup");
+    }
     const glOptions = { gl: mockGlContext as unknown as WebGLRenderingContext };
-    const createBufferSpyCtx = vi.spyOn(mockGlContext, "createBuffer");
-    createBufferSpyCtx.mockReturnValueOnce({
-      mockBuffer: true,
-      id: "pointOrigin",
-    });
-    mockWebGLOverlayViewInstance.onContextRestored(glOptions);
-    createBufferSpyCtx.mockRestore();
+    capturedRendererMethods.onContextRestored(glOptions);
+    const expectedPointOriginBuffer = { mockBuffer: true, id: "buffer-0" };
+    expect((renderer as any).pointOriginBuffer).toEqual(
+      expectedPointOriginBuffer
+    );
 
     renderer.updateMarker("track1", { lat: 1, lng: 1 });
-    const trackBufferMock = { mockBuffer: true, id: "track1Buffer" };
-    const createBufferSpyDraw = vi.spyOn(mockGlContext, "createBuffer");
-    createBufferSpyDraw.mockReturnValueOnce(trackBufferMock);
+
+    renderer.updateMarker("track1", { lat: 1.1, lng: 1.1 });
+
+    if (!capturedRendererMethods?.onDraw) {
+      throw new Error("onDraw method not captured for setup");
+    }
     const drawOptions = {
       gl: mockGlContext as unknown as WebGLRenderingContext,
       transformer: mockTransformer,
     };
-    mockWebGLOverlayViewInstance.onDraw(drawOptions);
-    createBufferSpyDraw.mockRestore();
-    expect((renderer as any).markersData.get("track1").buffer).toBe(
-      trackBufferMock
-    );
+    capturedRendererMethods.onDraw(drawOptions);
+    const expectedTrackBuffer = { mockBuffer: true, id: "buffer-1" };
+    const markerData = (renderer as any).markersData.get("track1");
+    expect(markerData.buffer).toEqual(expectedTrackBuffer);
 
     renderer.removeMarker("track1");
 
     expect(mockGlContext.deleteBuffer).toHaveBeenCalledTimes(1);
-    expect(mockGlContext.deleteBuffer).toHaveBeenCalledWith(trackBufferMock);
+    expect(mockGlContext.deleteBuffer).toHaveBeenCalledWith(
+      expectedTrackBuffer
+    );
     expect((renderer as any).markersData.has("track1")).toBe(false);
   });
 
   it("removeAllMarkers should clear all track data and specific buffers", () => {
+    if (!capturedRendererMethods?.onContextRestored) {
+      throw new Error("onContextRestored method not captured for setup");
+    }
     const glOptions = { gl: mockGlContext as unknown as WebGLRenderingContext };
-    const createBufferSpyCtx = vi.spyOn(mockGlContext, "createBuffer");
-    createBufferSpyCtx.mockReturnValueOnce({
-      mockBuffer: true,
-      id: "pointOrigin",
-    });
-    mockWebGLOverlayViewInstance.onContextRestored(glOptions);
-    createBufferSpyCtx.mockRestore();
+    capturedRendererMethods.onContextRestored(glOptions);
 
     renderer.updateMarker("track1", { lat: 1, lng: 1 });
+
+    renderer.updateMarker("track1", { lat: 1.1, lng: 1.1 });
+
     renderer.updateMarker("track2", { lat: 2, lng: 2 });
-    const track1BufferMock = { mockBuffer: true, id: "track1Buffer" };
-    const track2BufferMock = { mockBuffer: true, id: "track2Buffer" };
-    const createBufferSpyDraw = vi.spyOn(mockGlContext, "createBuffer");
-    createBufferSpyDraw
-      .mockReturnValueOnce(track1BufferMock)
-      .mockReturnValueOnce(track2BufferMock);
+
+    renderer.updateMarker("track1", { lat: 1.1, lng: 1.1 });
+    renderer.updateMarker("track2", { lat: 2.1, lng: 2.1 });
+
+    const expectedTrack1BufferId = "buffer-1";
+    const expectedTrack2BufferId = "buffer-2";
+
+    if (!capturedRendererMethods?.onDraw) {
+      throw new Error("onDraw method not captured for setup");
+    }
     const drawOptions = {
       gl: mockGlContext as unknown as WebGLRenderingContext,
       transformer: mockTransformer,
@@ -475,23 +572,34 @@ describe("WebGLOverlayRenderer", () => {
     expect((renderer as any).markersData.get("track1").buffer).toBeNull();
     expect((renderer as any).markersData.get("track2").buffer).toBeNull();
 
-    mockWebGLOverlayViewInstance.onDraw(drawOptions);
+    capturedRendererMethods.onDraw(drawOptions);
 
-    expect(createBufferSpyDraw).toHaveBeenCalledTimes(2);
-    expect((renderer as any).markersData.get("track1").buffer).toBe(
-      track1BufferMock
-    );
-    expect((renderer as any).markersData.get("track2").buffer).toBe(
-      track2BufferMock
-    );
+    expect(mockGlContext.createBuffer).toHaveBeenCalledTimes(1 + 2);
+    const expectedTrack1Buffer = {
+      mockBuffer: true,
+      id: expectedTrack1BufferId,
+    };
+    const expectedTrack2Buffer = {
+      mockBuffer: true,
+      id: expectedTrack2BufferId,
+    };
 
-    createBufferSpyDraw.mockRestore();
+    expect((renderer as any).markersData.get("track1").buffer).toEqual(
+      expectedTrack1Buffer
+    );
+    expect((renderer as any).markersData.get("track2").buffer).toEqual(
+      expectedTrack2Buffer
+    );
 
     renderer.removeAllMarkers();
 
     expect(mockGlContext.deleteBuffer).toHaveBeenCalledTimes(2);
-    expect(mockGlContext.deleteBuffer).toHaveBeenCalledWith(track1BufferMock);
-    expect(mockGlContext.deleteBuffer).toHaveBeenCalledWith(track2BufferMock);
+    expect(mockGlContext.deleteBuffer).toHaveBeenCalledWith(
+      expectedTrack1Buffer
+    );
+    expect(mockGlContext.deleteBuffer).toHaveBeenCalledWith(
+      expectedTrack2Buffer
+    );
     expect((renderer as any).markersData.size).toBe(0);
     expect((renderer as any).colorMap.size).toBe(0);
   });

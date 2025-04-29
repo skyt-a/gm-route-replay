@@ -123,6 +123,12 @@ importers:
 
   packages/core:
     devDependencies:
+      '@googlemaps/jest-mocks':
+        specifier: ^2.0.0
+        version: 2.22.6
+      '@soleo/google-maps-vitest-mocks':
+        specifier: ^2.21.5
+        version: 2.21.5
       '@types/google.maps':
         specifier: ^3.58.0
         version: 3.58.1
@@ -691,6 +697,9 @@ packages:
     resolution: {integrity: sha512-ZAoA40rNMPwSm+AeHpCq8STiNAwzWLJuP8Xv4CHIc9wv/PSuExjMrmjfYNj682vW0OOiZ1HKxzvjQr9XZIisQA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
+  '@googlemaps/jest-mocks@2.22.6':
+    resolution: {integrity: sha512-t3n0l03OdGPEUCfWVC1a4xGgcE21+58tGdNsIjGWsTbsaMZBOfCxwTHvzmAx/H0dyPeKZ4uWmtahsyUQIcGInA==}
+
   '@googlemaps/js-api-loader@1.16.8':
     resolution: {integrity: sha512-CROqqwfKotdO6EBjZO/gQGVTbeDps5V7Mt9+8+5Q+jTg5CRMi3Ii/L9PmV3USROrt2uWxtGzJHORmByxyo9pSQ==}
 
@@ -884,6 +893,9 @@ packages:
 
   '@shikijs/vscode-textmate@10.0.2':
     resolution: {integrity: sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg==}
+
+  '@soleo/google-maps-vitest-mocks@2.21.5':
+    resolution: {integrity: sha512-hmHRjMHSzl8XKAC1al1isim4iBss3tjLc6jCDdN5jtKkrB3JpNlE3FCzh6OGJhQU6n2Ym1vXVxAywAddUtw4tQ==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -2832,6 +2844,8 @@ snapshots:
       '@eslint/core': 0.13.0
       levn: 0.4.1
 
+  '@googlemaps/jest-mocks@2.22.6': {}
+
   '@googlemaps/js-api-loader@1.16.8': {}
 
   '@humanfs/core@0.19.1': {}
@@ -2995,6 +3009,8 @@ snapshots:
       '@types/hast': 3.0.4
 
   '@shikijs/vscode-textmate@10.0.2': {}
+
+  '@soleo/google-maps-vitest-mocks@2.21.5': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
