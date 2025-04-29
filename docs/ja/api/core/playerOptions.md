@@ -29,10 +29,10 @@
     *   `aheadDistance?`: `number` (デフォルト: `100`) - `'ahead'` モードで何メートル先を見るか。
     *   `defaultTilt?`: `number` (デフォルト: `45`) - `'ahead'` モードでのデフォルトの傾斜角度。
     *   `zoomLevel?`: `number` - カメラモードでの固定ズームレベル。設定すると `autoFit` によるズーム調整を上書きします。
-*   **`rendererType?`**: `'marker' | 'webgl'` (オプション, デフォルト: `'marker'`)
+*   **`rendererType?`**: `'marker' | 'webgl'` (オプション, **デフォルト: `'marker'`**)
     ルート上の現在位置を描画する方法を選択します。
-    *   `'marker'`: 標準の `google.maps.Marker` を使用します。シンプルですが、マーカー数が多いとパフォーマンスが低下する可能性があります。
-    *   `'webgl'`: `google.maps.WebGLOverlayView` を使用します。多数のマーカーを効率的に描画でき、推奨される方法です。使用するには Google Maps Platform で Map ID を設定する必要があります。
+    *   `'marker'`: 標準の `google.maps.Marker` を使用します。シンプルで設定も簡単ですが、マーカーの数が増えるとパフォーマンスが低下する可能性があります。
+    *   `'webgl'`: `google.maps.WebGLOverlayView` を使用します。多数のマーカーを効率的に描画でき、パフォーマンスが重要な場合に推奨される方法です。使用するには Google Maps Platform で Map ID を設定する必要があります。
 
 ## 例
 

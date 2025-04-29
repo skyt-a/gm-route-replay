@@ -29,10 +29,10 @@ An interface defining the configuration options passed to the `createPlayer` fun
     *   `aheadDistance?`: `number` (Default: `100`) - How many meters ahead to look in `'ahead'` mode.
     *   `defaultTilt?`: `number` (Default: `45`) - Default tilt angle for `'ahead'` mode.
     *   `zoomLevel?`: `number` - Fixed zoom level for camera modes. Overrides `autoFit` zoom adjustment if set.
-*   **`rendererType?`**: `'marker' | 'webgl'` (Optional, Default: `'marker'`)
+*   **`rendererType?`**: `'marker' | 'webgl'` (Optional, **Default: `'marker'`**)
     Selects the method for rendering the current position on the route.
-    *   `'marker'`: Uses standard `google.maps.Marker`. Simple, but performance may degrade with many markers.
-    *   `'webgl'`: Uses `google.maps.WebGLOverlayView`. Recommended for efficiently rendering a large number of markers. Requires setting up a Map ID in the Google Maps Platform.
+    *   `'marker'`: Uses standard `google.maps.Marker`. Simple and easy to set up, but performance may degrade with many markers.
+    *   `'webgl'`: Uses `google.maps.WebGLOverlayView`. Recommended for efficiently rendering a large number of markers when performance is critical. Requires setting up a Map ID in the Google Maps Platform.
 
 ## Example
 
