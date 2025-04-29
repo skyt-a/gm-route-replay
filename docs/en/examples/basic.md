@@ -1,14 +1,14 @@
-# Basic React Example
+# React Component Example
 
-This page shows a basic usage example using the React hook.
+This page shows a basic usage example using the `<RouteReplay>` component.
 
-Make sure you have a `.env` file in the `examples/react-vite` directory with your `VITE_GOOGLE_MAPS_API_KEY` and `VITE_GOOGLE_MAPS_MAP_ID` (if using WebGL renderer).
+Make sure you have a `.env` file in the `examples/react-vite` directory with your `VITE_GOOGLE_MAPS_API_KEY` and `VITE_GOOGLE_MAPS_MAP_ID` (if using WebGL rendering).
 
 ```tsx
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
-import { useRouteReplay } from "gm-route-replay-react"; // Assuming workspace link works
-import type { RoutePoint, RouteInput, CameraMode } from "gm-route-replay-core";
+import { RouteReplay, RouteReplayHandle } from "gm-route-replay-react";
+import type { RoutePoint, RouteInput, CameraMode, PlayerEventMap } from "gm-route-replay-core";
 import "./App.css";
 
 // --- Sample Data & Config (Outside Component) ---
@@ -85,27 +85,17 @@ const polylineOptionsConfig: google.maps.PolylineOptions = {
 function App() {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID; // Read Map ID from env
-  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
+  const replayHandleRef = useRef<RouteReplayHandle>(null);
 
-  // Memoize options *before* useEffect that uses them
-  const routeReplayOptions = useMemo(
-    () => ({
-      mapContainerRef: mapContainerRef as React.RefObject<HTMLDivElement>,
-      isMapApiLoaded: isMapApiLoaded,
-      route: multiTrackRouteData,
-      autoFit: true,
-      markerOptions: markerOptionsConfig,
-      polylineOptions: polylineOptionsConfig,
-      initialSpeed: 1,
-      cameraMode: "center",
-      cameraOptions: { zoomLevel: 16 },
-      rendererType: "webgl",
-      mapId: mapId,
-    }),
-    [isMapApiLoaded, mapId]
-  );
+  // State for playback control and display
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [speed, setSpeed] = useState(1);
+  const [durationMs, setDurationMs] = useState(0);
+  const [currentCameraMode, setCurrentCameraMode] = useState<CameraMode>("center");
+  const [isSeeking, setIsSeeking] = useState(false);
 
   // Effect to handle map loading
   useEffect(() => {
@@ -113,103 +103,173 @@ function App() {
       setError("Missing VITE_GOOGLE_MAPS_API_KEY in .env file");
       return;
     }
-    if (routeReplayOptions.rendererType === "webgl" && !mapId) {
-      setError(
-        "WebGLOverlayRenderer requires a VITE_GOOGLE_MAPS_MAP_ID in .env file."
-      );
-      return;
-    }
+    // Consider adding WebGL check if needed based on options
     const loader = new Loader({
       apiKey: apiKey,
       version: "weekly",
       libraries: ["maps", "geometry"], // ADDED geometry library
     });
     loader
-      .load()
-      .then(() => {
+      .importLibrary("maps")
+      .then((google) => {
         console.log("Google Maps API loaded (maps, geometry)");
-        setIsMapApiLoaded(true);
+        if (!mapInstance) {
+          const map = new google.Map(document.getElementById("map")!, {
+            center: { lat: 35.68, lng: 139.76 },
+            zoom: 15,
+            disableDefaultUI: true, // Example: customize UI
+            mapId: mapId,
+          });
+          setMapInstance(map);
+        }
       })
       .catch((e: unknown) => {
-        console.error("Error loading Google Maps API:", e);
-        setError("Failed to load Google Maps API. Check API key and network.");
+        console.error("Error loading/initializing Google Maps:", e);
+        setError("Failed to load/initialize Google Maps.");
       });
-  }, [apiKey, mapId, routeReplayOptions.rendererType]); // Depend on specific option field
+  }, [apiKey, mapId, mapInstance]);
 
-  const { state, controls } = useRouteReplay(routeReplayOptions);
+  // --- Event Handlers for <RouteReplay> Component ---
+  const handleFrame: PlayerEventMap["frame"] = useCallback(
+    (payload) => {
+      if (!isSeeking) {
+        setProgress(payload.progress);
+      }
+    },
+    [isSeeking]
+  );
 
-  // --- Callbacks must also be at the top level ---
+  const handleStart = useCallback(() => setIsPlaying(true), []);
+  const handlePause = useCallback(() => setIsPlaying(false), []);
+
+  const handleSeek: PlayerEventMap["seek"] = useCallback(
+    (payload) => {
+      const currentDuration = replayHandleRef.current?.getDurationMs() ?? 0;
+      if (currentDuration !== durationMs) {
+        setDurationMs(currentDuration);
+      }
+      if (!isSeeking) {
+        const newProgress = currentDuration > 0 ? payload.timeMs / currentDuration : 0;
+        setProgress(Math.min(1, Math.max(0, newProgress)));
+      }
+    },
+    [durationMs, isSeeking]
+  );
+
+  const handleFinish = useCallback(() => {
+    setIsPlaying(false);
+    setProgress(1);
+  }, []);
+
+  const handleError: PlayerEventMap["error"] = useCallback((payload) => {
+    console.error("Error event:", payload.error);
+    setError(`Replay Error: ${payload.error.message}`);
+    setIsPlaying(false);
+  }, []);
+
+  // --- Control Callbacks using the ref ---
+  const handlePlay = useCallback(() => replayHandleRef.current?.play(), []);
+  const handlePauseControl = useCallback(() => replayHandleRef.current?.pause(), []);
+  const handleStop = useCallback(() => {
+    replayHandleRef.current?.stop();
+    setProgress(0);
+    setIsPlaying(false);
+  }, []);
+
   const handleSpeedChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newSpeed = parseFloat(event.target.value);
-      console.log(`[App] handleSpeedChange: New speed value = ${newSpeed}`); // DEBUG LOG
       if (!isNaN(newSpeed)) {
-        console.log("[App] Calling controls.setSpeed..."); // DEBUG LOG
-        controls.setSpeed(newSpeed);
+        replayHandleRef.current?.setSpeed(newSpeed);
+        setSpeed(newSpeed);
       }
     },
-    [controls]
+    []
   );
 
   const handleSetSpeed = useCallback(
     (speed: number) => {
-      console.log(`[App] handleSetSpeed: Setting speed to ${speed}x`); // DEBUG LOG
-      console.log("[App] Calling controls.setSpeed..."); // DEBUG LOG
-      controls.setSpeed(speed);
+      replayHandleRef.current?.setSpeed(speed);
+      setSpeed(speed);
     },
-    [controls]
+    []
   );
 
   // Callback for camera mode change
   const handleCameraModeChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const mode = event.target.value as CameraMode;
-      // TODO: Pass options if needed for 'ahead' mode customization
-      (controls as any).setCameraMode(mode);
+      replayHandleRef.current?.setCameraMode(mode);
+      setCurrentCameraMode(mode);
     },
-    [controls]
+    []
   );
 
-  // Log state changes for debugging
-  useEffect(() => {
-    console.log("[App] State updated:", state); // DEBUG LOG
-  }, [state]);
+  // --- Seek Bar Handlers ---
+  const handleSeekInput = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setIsSeeking(true);
+      const newProgress = parseFloat(event.target.value);
+      setProgress(newProgress);
+    },
+    []
+  );
+
+  const handleSeekChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newProgress = parseFloat(event.target.value);
+      if (durationMs > 0 && replayHandleRef.current) {
+        replayHandleRef.current.seek(newProgress * durationMs);
+      }
+      setIsSeeking(false);
+    },
+    [durationMs]
+  );
 
   // --- Conditional rendering based on error (this is fine) ---
   if (error) {
     return <div className="error">Error: {error}</div>;
   }
 
-  const progressPercent = (state.progress * 100).toFixed(1);
+  const isReady = !!mapInstance && durationMs > 0;
 
   // --- JSX return ---
   return (
     <>
       <h1>gm-route-replay React Example (Multi-Track)</h1>
+      {/* Map container */}
       <div
-        ref={mapContainerRef}
         id="map"
-        style={{ height: "500px", width: "100%", marginBottom: "1rem" }}
-      >
-        {!isMapApiLoaded && <div>Loading Google Maps API...</div>}
-      </div>
+        style={{ height: "500px", width: "100%" }}
+      ></div>
 
+      {/* RouteReplay Component */}
+      {mapInstance && (
+        <RouteReplay
+          ref={replayHandleRef}
+          map={mapInstance}
+          route={multiTrackRouteData}
+          autoFit={true}
+          markerOptions={markerOptionsConfig}
+          polylineOptions={polylineOptionsConfig}
+          initialSpeed={1}
+          cameraMode={"center"}
+          // Event Handlers
+          onFrame={handleFrame}
+          onStart={handleStart}
+          onPause={handlePause}
+          onSeek={handleSeek}
+          onFinish={handleFinish}
+          onError={handleError}
+        />
+      )}
+
+      {/* Controls (Simplified - adapt as needed) */}
       <div className="controls">
-        {/* ... Play/Pause/Stop buttons ... */}
-        <button
-          onClick={controls.play}
-          disabled={state.isPlaying || !isMapApiLoaded}
-        >
-          {" "}
-          Play{" "}
-        </button>
-        <button
-          onClick={controls.pause}
-          // ... rest of the code ...
-        >
-          Pause
-        </button>
-        {/* Add the rest of the App.tsx code here */}
+        <button onClick={handlePlay} disabled={isPlaying || !isReady}>Play</button>
+        <button onClick={handlePauseControl} disabled={!isPlaying || !isReady}>Pause</button>
+        <button onClick={handleStop} disabled={!isReady}>Stop</button>
+        {/* Add more controls like speed, seek bar, camera mode here */}
       </div>
     </>
   );
@@ -219,4 +279,3 @@ export default App;
 
 ```
 
-*(Note: The full code is longer, this includes the setup and main component structure)* 

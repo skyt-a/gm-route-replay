@@ -33,24 +33,31 @@ pnpm add gm-route-replay-core
 pnpm add gm-route-replay-react
 ```
 
-## Basic Usage (React Hook)
+## Basic Usage (React Component)
 
 ```tsx
 import React, { useRef, useState, useEffect } from 'react';
-import { Loader } from '@googlemaps/js-api-loader';
-import { useRouteReplay } from 'gm-route-replay-react';
+import { Loader } from "@googlemaps/js-api-loader";
+import { RouteReplay, RouteReplayHandle } from "gm-route-replay-react";
 import type { RouteInput } from 'gm-route-replay-core';
 
 function MapComponent() {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+  const replayHandleRef = useRef<RouteReplayHandle>(null);
   const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with your API key
   const mapId = 'YOUR_MAP_ID'; // Optional: Required for WebGL renderer
 
   // Load Google Maps API
   useEffect(() => {
     const loader = new Loader({ apiKey, version: 'weekly', libraries: ['maps'] });
-    loader.load().then(() => setIsMapApiLoaded(true));
+    loader.importLibrary("maps").then((google) => {
+      const map = new google.Map(document.getElementById("map")!, {
+        center: { lat: 35.68, lng: 139.76 },
+        zoom: 15,
+        mapId: mapId,
+      });
+      setMapInstance(map);
+    });
   }, [apiKey]);
 
   const routeData: RouteInput = [
@@ -59,21 +66,24 @@ function MapComponent() {
     // ... more points
   ];
 
-  const { state, controls } = useRouteReplay({
-    mapContainerRef,
-    isMapApiLoaded,
-    route: routeData,
-    rendererType: 'webgl', // Using WebGL renderer
-    mapId: mapId,
-  });
-
   return (
     <div>
-      <div ref={mapContainerRef} style={{ height: '400px', width: '100%' }} />
-      <button onClick={controls.play} disabled={!isMapApiLoaded || state.isPlaying}>
+      <div id="map" style={{ height: '400px', width: '100%' }} />
+      {mapInstance && (
+        <RouteReplay
+          ref={replayHandleRef}
+          map={mapInstance}
+          route={routeData}
+          autoFit={true}
+          // Options can be passed here
+          // markerOptions={{...}}
+          // polylineOptions={{...}}
+        />
+      )}
+      <button onClick={() => replayHandleRef.current?.play()} disabled={!mapInstance}>
         Play
       </button>
-      <button onClick={controls.pause} disabled={!isMapApiLoaded || !state.isPlaying}>
+      <button onClick={() => replayHandleRef.current?.pause()} disabled={!mapInstance}>
         Pause
       </button>
       {/* Add more controls as needed */}
