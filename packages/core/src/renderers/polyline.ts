@@ -79,6 +79,16 @@ export class PolylineRenderer {
   }
 
   /**
+   * Gets the current path for a specific track.
+   * @param trackId - Identifier for the track.
+   * @returns The current path as an array of LatLngLiterals, or an empty array if not found.
+   */
+  getCurrentPath(trackId: string): google.maps.LatLngLiteral[] {
+    // Return a copy to prevent external modification
+    return [...(this.currentPaths.get(trackId) || [])];
+  }
+
+  /**
    * Resets the polyline paths for all tracks.
    */
   resetAllPaths(): void {

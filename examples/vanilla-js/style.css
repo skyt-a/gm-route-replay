@@ -1,0 +1,38 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+#map {
+  height: 500px;
+  width: 100%;
+  margin-bottom: 1rem;
+  background-color: #eee; /* Placeholder background */
+}
+
+.controls {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Spacing between elements */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+label {
+  margin-right: 5px;
+}
+
+input[type="range"] {
+  vertical-align: middle;
+  margin: 0 5px;
+}
+
+#progressSlider {
+  width: 300px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

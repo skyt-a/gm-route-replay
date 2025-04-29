@@ -37,19 +37,21 @@ export interface InterpolatedPoint {
  * Calculates heading based on segment direction if not present in data.
  * Requires google.maps.geometry library to be loaded for heading calculation.
  * @param route Sorted array of RoutePoints.
- * @param timeMs The target time in milliseconds (relative to the route's start time).
- * @param startTimeMs The timestamp of the first point in the route.
- * @param durationMs The total duration of the route.
+ * @param absoluteTimeMs The target absolute time in milliseconds (Unix timestamp or similar).
+ * @param startTimeMs The absolute timestamp of the first point in the route.
+ * @param durationMs The total duration of the route in milliseconds.
  * @returns The interpolated point, or null if time is out of bounds.
  */
 export function interpolateRoute(
   route: RoutePoint[],
-  timeMs: number,
+  absoluteTimeMs: number,
   startTimeMs: number,
   durationMs: number
 ): InterpolatedPoint | null {
-  // --- Time bounds check (return start/end point) ---
-  if (timeMs <= 0 && route.length > 0) {
+  // --- Time bounds check using absolute time ---
+  const endTimeMs = startTimeMs + durationMs;
+
+  if (absoluteTimeMs <= startTimeMs && route.length > 0) {
     // Calculate heading from first segment if needed
     let heading = route[0].heading;
     if (
@@ -69,7 +71,7 @@ export function interpolateRoute(
       progress: 0,
     };
   }
-  if (timeMs >= durationMs && route.length > 0) {
+  if (absoluteTimeMs >= endTimeMs && route.length > 0) {
     const lastPoint = route[route.length - 1];
     // Calculate heading from last segment if needed
     let heading = lastPoint.heading;
@@ -90,30 +92,30 @@ export function interpolateRoute(
       progress: 1,
     };
   }
-  if (!route || route.length < 2 || timeMs < 0 || timeMs > durationMs) {
-    return null; // Should not happen after bounds check, but safety return
+  if (
+    !route ||
+    route.length < 2 ||
+    absoluteTimeMs < startTimeMs ||
+    absoluteTimeMs > endTimeMs
+  ) {
+    return null;
   }
   // --- End Time bounds check ---
 
-  const targetTimestamp = startTimeMs + timeMs;
+  const targetTimestamp = absoluteTimeMs;
 
   // Find the segment [p1, p2]
   let p1: RoutePoint | null = null;
   let p2: RoutePoint | null = null;
-  // Optimize search? For now, linear scan is fine.
   for (let i = 0; i < route.length - 1; i++) {
-    // Handle segment with zero duration (identical timestamps)
     if (route[i].t === route[i + 1].t) {
-      // If target time matches the identical timestamp, use the second point of the pair
       if (targetTimestamp === route[i].t) {
         p1 = route[i];
         p2 = route[i + 1];
         break;
       }
-      // Otherwise, skip this zero-duration segment for finding the interval
       continue;
     }
-    // Normal segment check
     if (targetTimestamp >= route[i].t && targetTimestamp <= route[i + 1].t) {
       p1 = route[i];
       p2 = route[i + 1];
@@ -123,12 +125,10 @@ export function interpolateRoute(
 
   if (!p1 || !p2) {
     console.warn(
-      "Interpolator could not find segment for timeMs:",
-      timeMs,
-      " Target Ts:",
-      targetTimestamp
+      "Interpolator could not find segment for absolute time:",
+      absoluteTimeMs
     );
-    return null; // Return null if segment not found
+    return null;
   }
 
   // Calculate interpolation factor 't'
@@ -163,7 +163,11 @@ export function interpolateRoute(
   // --- End Heading calculation ---
 
   const progress =
-    durationMs > 0 ? timeMs / durationMs : timeMs >= durationMs ? 1 : 0;
+    durationMs > 0
+      ? (absoluteTimeMs - startTimeMs) / durationMs
+      : absoluteTimeMs >= endTimeMs
+      ? 1
+      : 0;
 
   return { lat, lng, heading, progress: Math.min(1, Math.max(0, progress)) };
 }
