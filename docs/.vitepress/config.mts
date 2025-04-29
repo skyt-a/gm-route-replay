@@ -33,9 +33,18 @@ export default defineConfig({
                 text: "コアライブラリ (gm-route-replay-core)",
                 collapsed: false,
                 items: [
-                  { text: "createPlayer", link: "/ja/api/core/createPlayer" },
-                  { text: "PlayerOptions", link: "/ja/api/core/playerOptions" },
-                  { text: "PlayerHandle", link: "/ja/api/core/playerHandle" },
+                  {
+                    text: "GmRouteReplayOverlay",
+                    link: "/ja/api/core/gm-route-replay-overlay",
+                  },
+                  {
+                    text: "OverlayOptions",
+                    link: "/ja/api/core/overlay-options",
+                  },
+                  {
+                    text: "OverlayMethods",
+                    link: "/ja/api/core/overlay-methods",
+                  },
                   { text: "RoutePoint", link: "/ja/api/core/routePoint" },
                   { text: "RouteInput", link: "/ja/api/core/routeInput" },
                   { text: "CameraMode", link: "/ja/api/core/cameraMode" },
@@ -95,9 +104,18 @@ export default defineConfig({
                 text: "Core Library (gm-route-replay-core)",
                 collapsed: false,
                 items: [
-                  { text: "createPlayer", link: "/en/api/core/createPlayer" },
-                  { text: "PlayerOptions", link: "/en/api/core/playerOptions" },
-                  { text: "PlayerHandle", link: "/en/api/core/playerHandle" },
+                  {
+                    text: "GmRouteReplayOverlay",
+                    link: "/en/api/core/gm-route-replay-overlay",
+                  },
+                  {
+                    text: "OverlayOptions",
+                    link: "/en/api/core/overlay-options",
+                  },
+                  {
+                    text: "OverlayMethods",
+                    link: "/en/api/core/overlay-methods",
+                  },
                   { text: "RoutePoint", link: "/en/api/core/routePoint" },
                   { text: "RouteInput", link: "/en/api/core/routeInput" },
                   { text: "CameraMode", link: "/en/api/core/cameraMode" },

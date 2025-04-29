@@ -119,10 +119,10 @@ If you are not using React, you can use the core library directly.
 ```
 
 ```javascript:core-example.js
-import { createPlayer } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay } from 'gm-route-replay-core';
 
 let map;
-let player;
+let replayOverlay;
 
 // This function is called by the Google Maps script load
 function initMap() {
@@ -140,16 +140,21 @@ function initMap() {
     { lat: 35.680, lng: 139.760, t: Date.now() + 40000, heading: 180 },
   ];
 
-  player = createPlayer({
+  replayOverlay = new GmRouteReplayOverlay({
     map: map,
     route: routeData,
     autoFit: true,
-    rendererType: 'webgl', 
-    mapId: 'YOUR_MAP_ID',
+    // Add other options as needed
   });
 
-  document.getElementById('playBtn')?.addEventListener('click', () => player?.play());
-  document.getElementById('pauseBtn')?.addEventListener('click', () => player?.pause());
+  // Set the overlay on the map
+  replayOverlay.setMap(map);
+
+  // Add controls after the overlay is ready
+  replayOverlay.addEventListener('ready', () => {
+    document.getElementById('playBtn')?.addEventListener('click', () => replayOverlay?.play());
+    document.getElementById('pauseBtn')?.addEventListener('click', () => replayOverlay?.pause());
+  });
 }
 
 window.initMap = initMap;

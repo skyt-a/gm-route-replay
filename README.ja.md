@@ -115,10 +115,10 @@ React を使用しない場合は、コアライブラリを直接利用でき�
 ```
 
 ```javascript: core-example.js
-import { createPlayer } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay } from 'gm-route-replay-core';
 
 let map;
-let player;
+let replayOverlay;
 
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -135,16 +135,20 @@ function initMap() {
     { lat: 35.680, lng: 139.760, t: Date.now() + 40000, heading: 180 },
   ];
 
-  player = createPlayer({
+  replayOverlay = new GmRouteReplayOverlay({
     map: map,
     route: routeData,
     autoFit: true,
-    rendererType: 'webgl',
-    mapId: 'YOUR_MAP_ID',
   });
 
-  document.getElementById('playBtn')?.addEventListener('click', () => player?.play());
-  document.getElementById('pauseBtn')?.addEventListener('click', () => player?.pause());
+  // マップにオーバーレイを設定
+  replayOverlay.setMap(map);
+
+  // オーバーレイの準備ができてからコントロールを追加
+  replayOverlay.addEventListener('ready', () => {
+    document.getElementById('playBtn')?.addEventListener('click', () => replayOverlay?.play());
+    document.getElementById('pauseBtn')?.addEventListener('click', () => replayOverlay?.pause());
+  });
 }
 
 window.initMap = initMap;
