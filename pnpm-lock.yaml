@@ -122,11 +122,10 @@ importers:
         version: 6.3.3(@types/node@22.15.3)(yaml@2.7.1)
 
   packages/core:
-    dependencies:
+    devDependencies:
       '@types/google.maps':
         specifier: ^3.58.0
         version: 3.58.1
-    devDependencies:
       tsup:
         specifier: ^8.4.0
         version: 8.4.0(postcss@8.5.3)(typescript@5.8.3)(yaml@2.7.1)
