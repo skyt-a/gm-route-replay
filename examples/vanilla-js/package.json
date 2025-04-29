@@ -1,0 +1,18 @@
+{
+  "name": "vanilla-js",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@googlemaps/js-api-loader": "^1.16.8",
+    "@types/google.maps": "^3.58.1",
+    "gm-route-replay-core": "workspace:^",
+    "typescript": "~5.7.2",
+    "vite": "^6.3.1"
+  }
+}

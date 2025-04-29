@@ -17,27 +17,41 @@ pnpm add gm-route-replay-react gm-route-replay-core react react-dom @types/googl
 ## Usage
 
 ```tsx
-import { useRouteReplay } from 'gm-route-replay-react';
+import { RouteReplay, RouteReplayHandle } from 'gm-route-replay-react';
 import { useRef, useState, useEffect } from 'react';
+import { Loader } from '@googlemaps/js-api-loader';
+import type { RouteInput } from 'gm-route-replay-core';
 
 function MyMapComponent() {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
-  // ... (Load Google Maps API logic)
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+  const replayHandleRef = useRef<RouteReplayHandle>(null);
+  const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace
 
-  const { state, controls } = useRouteReplay({
-    mapContainerRef,
-    isMapApiLoaded,
-    route: [/* your route points */],
-    // ... other options
-  });
+  useEffect(() => {
+    const loader = new Loader({ apiKey, version: 'weekly', libraries: ['maps'] });
+    loader.importLibrary("maps").then((google) => {
+      const map = new google.Map(document.getElementById("map")!, {
+        center: { lat: 35.68, lng: 139.76 },
+        zoom: 15,
+      });
+      setMapInstance(map);
+    });
+  }, [apiKey]);
+
+  const routeData: RouteInput = [/* your route points */];
 
   return (
     <div>
-      <div ref={mapContainerRef} style={{ height: '500px', width: '100%' }} />
-      {/* Add controls (play, pause, etc.) */}
-      <button onClick={controls.play} disabled={!isMapApiLoaded || state.isPlaying}>Play</button>
-      <button onClick={controls.pause} disabled={!isMapApiLoaded || !state.isPlaying}>Pause</button>
+      <div id="map" style={{ height: '500px', width: '100%' }} />
+      {mapInstance && (
+        <RouteReplay
+          ref={replayHandleRef}
+          map={mapInstance}
+          route={routeData}
+        />
+      )}
+      <button onClick={() => replayHandleRef.current?.play()} disabled={!mapInstance}>Play</button>
+      <button onClick={() => replayHandleRef.current?.pause()} disabled={!mapInstance}>Pause</button>
     </div>
   );
 }

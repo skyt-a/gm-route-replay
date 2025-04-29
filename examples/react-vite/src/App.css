@@ -15,6 +15,9 @@
   background-color: #333; /* Placeholder background */
   border-radius: 8px;
   margin-bottom: 1rem;
+  height: 500px;
+  width: 100%;
+  background-color: #eee; /* Placeholder background */
 }
 
 .controls button {
@@ -134,3 +137,175 @@ em {
 .read-the-docs {
   color: #888;
 }
+
+/* --- New Video Player Styles --- */
+
+.player-controls {
+  background-color: #282c34; /* Dark background */
+  color: white;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Distribute groups */
+  border-radius: 5px; /* Optional: rounded corners */
+  margin-top: -5px; /* Overlap slightly with map */
+  position: relative; /* Ensure it's above map if needed */
+  z-index: 10; /* Ensure it's above map */
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+}
+
+/* Playback Buttons */
+.playback-controls button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5em; /* Larger icons */
+  margin: 0 5px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.playback-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Progress Bar Area */
+.progress-group {
+  flex-grow: 1; /* Take up available space */
+  margin: 0 20px;
+  min-width: 200px; /* Prevent excessive shrinking */
+}
+
+.time-display {
+  font-size: 0.9em;
+  margin: 0 10px;
+  min-width: 40px; /* Ensure space for time */
+  text-align: center;
+}
+
+.progress-bar {
+  flex-grow: 1;
+  height: 8px;
+  cursor: pointer;
+  appearance: none; /* Override default look */
+  background: #555;
+  border-radius: 4px;
+  outline: none;
+}
+
+/* Style the thumb (the draggable handle) */
+.progress-bar::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #eee;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.progress-bar::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #eee;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.progress-bar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.progress-bar:disabled::-webkit-slider-thumb {
+    background: #aaa;
+}
+.progress-bar:disabled::-moz-range-thumb {
+    background: #aaa;
+}
+
+
+/* Settings Area */
+.settings-controls {
+  /* Styles for the container of speed/camera */
+}
+
+.settings-controls > div { /* Target direct children (speed-control, camera-control) */
+  margin-left: 15px; /* Space between setting groups */
+  display: flex;
+  align-items: center;
+}
+
+.settings-controls span {
+  margin-right: 8px;
+  font-size: 0.9em;
+}
+
+.settings-controls button {
+  background-color: #444;
+  border: 1px solid #666;
+  color: white;
+  padding: 4px 8px;
+  margin: 0 2px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.85em;
+}
+
+.settings-controls button:hover:not(:disabled) {
+  background-color: #555;
+}
+
+.settings-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #333; /* Slightly different disabled look */
+}
+
+/* --- End New Video Player Styles --- */
+
+/* Keep existing Map and Error styles (if any) */
+#map {
+  /* Ensure map has height/width (already set inline, but good practice) */
+  height: 500px;
+  width: 100%;
+  background-color: #eee; /* Placeholder background */
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  padding: 1rem;
+  border: 1px solid red;
+  background-color: #ffebeb;
+}
+
+/* Remove old .controls styles if they exist */
+/*
+.controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.speed-controls input[type=\"range\"] {
+  width: 150px;
+}
+
+.progress-controls input[type=\"range\"] {
+  flex-grow: 1; /* Make progress bar flexible */
+  min-width: 200px;
+}
+*/

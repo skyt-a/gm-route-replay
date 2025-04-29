@@ -22,7 +22,7 @@ export default defineConfig({
           {
             text: "サンプル",
             items: [
-              { text: "React Hook サンプル", link: "/ja/examples/basic" },
+              { text: "React Component サンプル", link: "/ja/examples/basic" },
               { text: "コアライブラリ使用例", link: "/ja/examples/core-basic" },
             ],
           },
@@ -43,12 +43,16 @@ export default defineConfig({
                 ],
               },
               {
-                text: "React Hook (gm-route-replay-react)",
+                text: "React Component (gm-route-replay-react)",
                 collapsed: false,
                 items: [
                   {
-                    text: "useRouteReplay",
-                    link: "/ja/api/react/useRouteReplay",
+                    text: "RouteReplay Component",
+                    link: "/ja/api/react/route-replay-component",
+                  },
+                  {
+                    text: "RouteReplay Handle",
+                    link: "/ja/api/react/route-replay-handle",
                   },
                 ],
               },
@@ -80,7 +84,7 @@ export default defineConfig({
           {
             text: "Examples",
             items: [
-              { text: "React Hook Example", link: "/en/examples/basic" },
+              { text: "React Component Example", link: "/en/examples/basic" },
               { text: "Core Library Example", link: "/en/examples/core-basic" },
             ],
           },
@@ -101,12 +105,16 @@ export default defineConfig({
                 ],
               },
               {
-                text: "React Hook (gm-route-replay-react)",
+                text: "React Component (gm-route-replay-react)",
                 collapsed: false,
                 items: [
                   {
-                    text: "useRouteReplay",
-                    link: "/en/api/react/useRouteReplay",
+                    text: "RouteReplay Component",
+                    link: "/en/api/react/route-replay-component",
+                  },
+                  {
+                    text: "RouteReplay Handle",
+                    link: "/en/api/react/route-replay-handle",
                   },
                 ],
               },

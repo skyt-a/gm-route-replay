@@ -1,11 +1,14 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { Loader } from "@googlemaps/js-api-loader";
-import { useRouteReplay } from "gm-route-replay-react"; // スコープを削除
-import type { RoutePoint, RouteInput, CameraMode } from "gm-route-replay-core"; // スコープを削除
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { RouteReplay, RouteReplayHandle } from "gm-route-replay-react";
+import type {
+  RoutePoint,
+  RouteInput,
+  CameraMode,
+  PlayerEventMap,
+} from "gm-route-replay-core";
 import "./App.css";
+import { Loader } from "@googlemaps/js-api-loader";
 
-// --- Sample Data & Config (Outside Component) ---
-// Function to create a simple square route
 const createSquareRoute = (
   startTime: number,
   latStart: number,
@@ -51,261 +54,276 @@ const createSquareRoute = (
   return points;
 };
 
-// --- Create Multi-Track Sample Data ---
 const now = Date.now();
 const multiTrackRouteData: RouteInput = {
-  track1: createSquareRoute(now, 35.68, 139.76, 0.01, 20, 0), // Square near Tokyo Station
-  track2: createSquareRoute(now + 5000, 35.685, 139.77, 0.005, 15, 45), // Smaller, faster square starting 5s later, offset heading
+  track1: createSquareRoute(now, 35.68, 139.76, 0.01, 20, 0),
+  track2: createSquareRoute(now + 5000, 35.685, 139.77, 0.005, 15, 45),
   track3: [
     // Simple line segment track
     { lat: 35.67, lng: 139.75, t: now + 2000, heading: 45 },
     { lat: 35.675, lng: 139.755, t: now + 12000, heading: 45 },
   ],
 };
-// --- End Multi-Track Sample Data ---
 
-// Stable config objects
-const markerOptionsConfig: google.maps.MarkerOptions = {
-  // title: "Replay Vehicle", // Title might be less useful for multi-track
-  // We might want different icons per track later
-};
 const polylineOptionsConfig: google.maps.PolylineOptions = {
-  strokeColor: "#FF0000", // Default color, might want per-track colors later
+  strokeColor: "#FF0000",
   strokeOpacity: 0.8,
   strokeWeight: 4,
 };
 
 function App() {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID; // Read Map ID from env
-  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
+  const replayHandleRef = useRef<RouteReplayHandle>(null);
 
-  // Memoize options *before* useEffect that uses them
-  const routeReplayOptions = useMemo(
-    () => ({
-      mapContainerRef: mapContainerRef as React.RefObject<HTMLDivElement>,
-      isMapApiLoaded: isMapApiLoaded,
-      route: multiTrackRouteData,
-      autoFit: true,
-      markerOptions: markerOptionsConfig,
-      polylineOptions: polylineOptionsConfig,
-      initialSpeed: 1,
-      cameraMode: "center" as CameraMode,
-      cameraOptions: { zoomLevel: 16 },
-      rendererType: "webgl",
-      mapId: mapId,
-    }),
-    [isMapApiLoaded, mapId]
-  );
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [durationMs, setDurationMs] = useState(0);
+  const [currentCameraMode, setCurrentCameraMode] =
+    useState<CameraMode>("center");
+  const [isSeeking, setIsSeeking] = useState(false);
 
-  // Effect to handle map loading
   useEffect(() => {
     if (!apiKey) {
       setError("Missing VITE_GOOGLE_MAPS_API_KEY in .env file");
       return;
     }
-    if (routeReplayOptions.rendererType === "webgl" && !mapId) {
-      setError(
-        "WebGLOverlayRenderer requires a VITE_GOOGLE_MAPS_MAP_ID in .env file."
-      );
-      return;
-    }
+
     const loader = new Loader({
       apiKey: apiKey,
       version: "weekly",
-      libraries: ["maps", "geometry"], // ADDED geometry library
+      libraries: ["maps", "geometry"],
     });
     loader
-      .load()
-      .then(() => {
+      .importLibrary("maps")
+      .then((google) => {
         console.log("Google Maps API loaded (maps, geometry)");
-        setIsMapApiLoaded(true);
+        if (!mapInstance) {
+          console.log("Initializing Google Map instance...");
+          const map = new google.Map(document.getElementById("map")!, {
+            center: { lat: 35.68, lng: 139.76 },
+            zoom: 15,
+            disableDefaultUI: true,
+            mapId: mapId,
+          });
+          setMapInstance(map);
+          console.log("Google Map instance created and set.");
+        }
       })
       .catch((e: unknown) => {
-        console.error("Error loading Google Maps API:", e);
-        setError("Failed to load Google Maps API. Check API key and network.");
+        console.error("Error loading/initializing Google Maps:", e);
+        setError("Failed to load/initialize Google Maps.");
       });
-  }, [apiKey, mapId, routeReplayOptions.rendererType]); // Depend on specific option field
+  }, [apiKey, mapId, mapInstance]);
 
-  const { state, controls } = useRouteReplay(routeReplayOptions);
-
-  // --- Callbacks must also be at the top level ---
-  const handleSpeedChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const newSpeed = parseFloat(event.target.value);
-      console.log(`[App] handleSpeedChange: New speed value = ${newSpeed}`); // DEBUG LOG
-      if (!isNaN(newSpeed)) {
-        console.log("[App] Calling controls.setSpeed..."); // DEBUG LOG
-        controls.setSpeed(newSpeed);
+  const handleFrame: PlayerEventMap["frame"] = useCallback(
+    (payload) => {
+      if (!isSeeking) {
+        setProgress(payload.progress);
       }
     },
-    [controls]
+    [isSeeking]
   );
+  const handleStart = useCallback(() => {
+    console.log("[App] Start event");
+    setIsPlaying(true);
+  }, []);
 
-  const handleSetSpeed = useCallback(
-    (speed: number) => {
-      console.log(`[App] handleSetSpeed: Setting speed to ${speed}x`); // DEBUG LOG
-      console.log("[App] Calling controls.setSpeed..."); // DEBUG LOG
-      controls.setSpeed(speed);
+  const handlePause = useCallback(() => setIsPlaying(false), []);
+
+  const handleSeek: PlayerEventMap["seek"] = useCallback(
+    (payload) => {
+      console.log("[App] Seek event:", payload);
+      const currentDuration = replayHandleRef.current?.getDurationMs() ?? 0;
+      if (currentDuration !== durationMs) {
+        setDurationMs(currentDuration);
+      }
+
+      if (!isSeeking) {
+        const newProgress =
+          currentDuration > 0 ? payload.timeMs / currentDuration : 0;
+        setProgress(Math.min(1, Math.max(0, newProgress)));
+      }
     },
-    [controls]
+    [durationMs, isSeeking]
   );
 
-  // Callback for camera mode change
-  const handleCameraModeChange = useCallback(
+  const handleFinish = useCallback(() => {
+    console.log("[App] Finish event");
+    setIsPlaying(false);
+    setProgress(1);
+  }, []);
+
+  const handleError: PlayerEventMap["error"] = useCallback((payload) => {
+    console.error("[App] Error event:", payload.error);
+    setError(`Replay Error: ${payload.error.message}`);
+    setIsPlaying(false);
+  }, []);
+
+  const handlePlay = useCallback(() => {
+    replayHandleRef.current?.play();
+    setIsPlaying(false);
+  }, []);
+  const handlePauseControl = useCallback(() => {
+    replayHandleRef.current?.pause();
+  }, []);
+  const handleStop = useCallback(() => {
+    replayHandleRef.current?.stop();
+    setProgress(0);
+    setIsPlaying(false);
+  }, []);
+
+  const handleSetSpeed = useCallback((newSpeed: number) => {
+    replayHandleRef.current?.setSpeed(newSpeed);
+  }, []);
+
+  const handleSetCameraMode = useCallback((mode: CameraMode) => {
+    replayHandleRef.current?.setCameraMode(mode);
+    setCurrentCameraMode(mode); // Keep this to update button states
+  }, []);
+
+  const handleSeekInput = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const mode = event.target.value as CameraMode;
-      // TODO: Pass options if needed for 'ahead' mode customization
-      (controls as any).setCameraMode(mode);
+      setIsSeeking(true);
+      const newProgress = parseFloat(event.target.value);
+      setProgress(newProgress);
     },
-    [controls]
+    []
   );
 
-  // Log state changes for debugging
-  useEffect(() => {
-    console.log("[App] State updated:", state); // DEBUG LOG
-  }, [state]);
+  const handleSeekChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newProgress = parseFloat(event.target.value);
+      if (durationMs > 0 && replayHandleRef.current) {
+        console.log(`[App] User seek to progress: ${newProgress}`);
+        replayHandleRef.current.seek(newProgress * durationMs);
+      }
+      setIsSeeking(false);
+    },
+    [durationMs]
+  );
 
-  // --- Conditional rendering based on error (this is fine) ---
   if (error) {
     return <div className="error">Error: {error}</div>;
   }
 
-  const progressPercent = (state.progress * 100).toFixed(1);
+  const isReady = !!mapInstance && durationMs > 0;
 
-  // --- JSX return ---
   return (
     <>
-      <h1>gm-route-replay React Example (Multi-Track)</h1>
+      <h1>gm-route-replay React Example (Component)</h1>
       <div
-        ref={mapContainerRef}
         id="map"
-        style={{ height: "500px", width: "100%", marginBottom: "1rem" }}
-      >
-        {!isMapApiLoaded && <div>Loading Google Maps API...</div>}
-      </div>
+        style={{ height: "500px", width: "100%", marginBottom: "0rem" }}
+      ></div>
 
-      <div className="controls">
-        {/* ... Play/Pause/Stop buttons ... */}
-        <button
-          onClick={controls.play}
-          disabled={state.isPlaying || !isMapApiLoaded}
-        >
-          {" "}
-          Play{" "}
-        </button>
-        <button
-          onClick={controls.pause}
-          disabled={!state.isPlaying || !isMapApiLoaded}
-        >
-          {" "}
-          Pause{" "}
-        </button>
-        <button onClick={controls.stop} disabled={!isMapApiLoaded}>
-          {" "}
-          Stop{" "}
-        </button>
-      </div>
-
-      {/* Speed Controls Section */}
-      <div className="controls speed-controls">
-        <span>Speed: {state.speed.toFixed(1)}x</span>
-        <input
-          type="range"
-          min="0.25"
-          max="8"
-          step="0.25"
-          value={state.speed}
-          onChange={handleSpeedChange}
-          disabled={!isMapApiLoaded}
-          style={{
-            marginLeft: "10px",
-            marginRight: "10px",
-            verticalAlign: "middle",
-          }}
+      {mapInstance && (
+        <RouteReplay
+          ref={replayHandleRef}
+          map={mapInstance}
+          route={multiTrackRouteData}
+          autoFit={true}
+          markerOptions={{}}
+          polylineOptions={polylineOptionsConfig}
+          initialSpeed={1}
+          cameraMode={"center"}
+          onFrame={handleFrame}
+          onStart={handleStart}
+          onPause={handlePause}
+          onSeek={handleSeek}
+          onFinish={handleFinish}
+          onError={handleError}
         />
-        <button onClick={() => handleSetSpeed(0.5)} disabled={!isMapApiLoaded}>
-          0.5x
-        </button>
-        <button onClick={() => handleSetSpeed(1)} disabled={!isMapApiLoaded}>
-          1x
-        </button>
-        <button onClick={() => handleSetSpeed(2)} disabled={!isMapApiLoaded}>
-          2x
-        </button>
-        <button onClick={() => handleSetSpeed(4)} disabled={!isMapApiLoaded}>
-          4x
-        </button>
-      </div>
+      )}
 
-      {/* Camera Mode Controls */}
-      <div className="controls camera-controls">
-        <span>Camera Mode:</span>
-        <label style={{ marginLeft: "10px" }}>
-          <input
-            type="radio"
-            name="cameraMode"
-            value="center"
-            checked={state.cameraMode === "center"}
-            onChange={handleCameraModeChange}
-            disabled={!isMapApiLoaded}
-          />{" "}
-          Center
-        </label>
-        <label style={{ marginLeft: "10px" }}>
-          <input
-            type="radio"
-            name="cameraMode"
-            value="ahead"
-            checked={state.cameraMode === "ahead"}
-            onChange={handleCameraModeChange}
-            disabled={!isMapApiLoaded}
-          />{" "}
-          Ahead
-        </label>
-        <label style={{ marginLeft: "10px" }}>
-          <input
-            type="radio"
-            name="cameraMode"
-            value="none"
-            checked={state.cameraMode === "none"}
-            onChange={handleCameraModeChange}
-            disabled={!isMapApiLoaded}
-          />{" "}
-          None
-        </label>
-      </div>
+      {/* --- Video Player Style Controls --- */}
+      <div className="player-controls">
+        {/* Play/Pause/Stop Group */}
+        <div className="control-group playback-controls">
+          <button onClick={handlePlay} disabled={isPlaying || !isReady}>
+            ▶️
+          </button>
+          <button onClick={handlePauseControl} disabled={!isReady}>
+            ⏸️
+          </button>
+          <button onClick={handleStop} disabled={!isReady}>
+            ⏹️
+          </button>
+        </div>
 
-      <div className="state">
-        {/* ... Status, Progress bar ... */}
-        <p>Status: {state.isPlaying ? "Playing" : "Paused/Stopped"}</p>
-        <p>Progress: {progressPercent}%</p>
-        <div className="progress-bar-container">
-          <div
+        <div className="control-group progress-group">
+          <span className="time-display current-time">
+            {durationMs > 0
+              ? ((progress * durationMs) / 1000).toFixed(1)
+              : "0.0"}
+            s
+          </span>
+          <input
+            type="range"
             className="progress-bar"
-            style={{ width: `${progressPercent}%` }}
-          ></div>
+            min="0"
+            max="1"
+            step="0.001" // Smaller step for smoother seeking
+            value={progress}
+            onInput={handleSeekInput} // Handle dragging
+            onChange={handleSeekChange} // Handle mouse up / change commit
+            disabled={!isReady}
+          />
+          <span className="time-display duration">
+            {durationMs > 0 ? (durationMs / 1000).toFixed(1) : "0.0"}s
+          </span>
+        </div>
+
+        {/* Settings Group (Speed, Camera) */}
+        <div className="control-group settings-controls">
+          {/* Speed Control (Simplified for now) */}
+          <div className="speed-control">
+            <span>Speed:</span>
+            <button onClick={() => handleSetSpeed(0.5)} disabled={!isReady}>
+              0.5x
+            </button>
+            <button onClick={() => handleSetSpeed(1)} disabled={!isReady}>
+              1x
+            </button>
+            <button onClick={() => handleSetSpeed(2)} disabled={!isReady}>
+              2x
+            </button>
+            {/* Range slider could be added back here or in a popup */}
+          </div>
+
+          {/* Camera Mode Control (Simplified for now) */}
+          <div className="camera-control">
+            <span>Camera:</span>
+            <button
+              onClick={() => handleSetCameraMode("center")}
+              disabled={currentCameraMode === "center" || !isReady}
+            >
+              Center
+            </button>
+            <button
+              onClick={() => handleSetCameraMode("ahead")}
+              disabled={currentCameraMode === "ahead" || !isReady}
+            >
+              Ahead
+            </button>
+            <button
+              onClick={() => handleSetCameraMode("none")}
+              disabled={currentCameraMode === "none" || !isReady}
+            >
+              None
+            </button>
+            {/* Radio buttons could be added back here or in a popup */}
+          </div>
         </div>
       </div>
+      {/* --- End Video Player Style Controls --- */}
 
-      {/* Example of how you *might* display per-track info if state exposed it */}
-      {/* <div className="per-track-state">
-          {Object.keys(state.tracks || {}).map(trackId => (
-              <div key={trackId}>
-                  Track {trackId}: Progress {((state.tracks[trackId].progress || 0) * 100).toFixed(1)}%
-              </div>
-          ))}
-      </div> */}
-
-      <p>
+      <p style={{ marginTop: "1rem" }}>
         <em>
-          Note: Ensure you have a valid <code>VITE_GOOGLE_MAPS_API_KEY</code>
-          {routeReplayOptions.rendererType === "webgl" &&
-            ", and a valid <code>VITE_GOOGLE_MAPS_MAP_ID</code>"}
-          in an <code>.env</code> file in the <code>examples/react-vite</code>{" "}
-          directory.
+          Note: Ensure VITE_GOOGLE_MAPS_API_KEY{" "}
+          {mapId && "and VITE_GOOGLE_MAPS_MAP_ID "}in .env
         </em>
       </p>
     </>

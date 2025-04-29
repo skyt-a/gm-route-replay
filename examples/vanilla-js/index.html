@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gm-route-replay Vanilla JS Example</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <article class="container">
+      <h1>gm-route-replay Vanilla JS Example</h1>
+      <div id="map"></div>
+
+      <div class="controls">
+        <button id="playBtn" disabled>Play</button>
+        <button id="pauseBtn" disabled>Pause</button>
+        <button id="stopBtn" disabled>Stop</button>
+      </div>
+
+      <div class="controls speed-controls">
+        <label for="speedRange">Speed:</label>
+        <span id="speedValue">1.0x</span>
+        <input
+          type="range"
+          id="speedRange"
+          min="0.25"
+          max="8"
+          step="0.25"
+          value="1"
+          disabled
+        />
+        <button class="speedBtn" data-speed="0.5" disabled>0.5x</button>
+        <button class="speedBtn" data-speed="1" disabled>1x</button>
+        <button class="speedBtn" data-speed="2" disabled>2x</button>
+        <button class="speedBtn" data-speed="4" disabled>4x</button>
+      </div>
+
+      <div class="controls camera-controls">
+        <span>Camera Mode:</span>
+        <label
+          ><input
+            type="radio"
+            name="cameraMode"
+            value="center"
+            checked
+            disabled
+          />
+          Center</label
+        >
+        <label
+          ><input type="radio" name="cameraMode" value="ahead" disabled />
+          Ahead</label
+        >
+        <label
+          ><input type="radio" name="cameraMode" value="none" disabled />
+          None</label
+        >
+      </div>
+
+      <div class="controls progress-display">
+        <label for="progressSlider">Progress:</label>
+        <span id="progressPercent">0.0%</span>
+        <input
+          type="range"
+          id="progressSlider"
+          min="0"
+          max="1"
+          step="0.001"
+          value="0"
+          disabled
+        />
+        <span id="timeDisplay">(?s / ?s)</span>
+      </div>
+
+      <div id="status">Status: Waiting for map...</div>
+      <div id="error" style="color: red"></div>
+
+      <script type="module" src="/src/main.ts"></script>
+    </article>
+  </body>
+</html>

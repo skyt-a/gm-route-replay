@@ -33,49 +33,56 @@ pnpm add gm-route-replay-core
 pnpm add gm-route-replay-react
 ```
 
-## 基本的な使い方 (React Hook)
+## 基本的な使い方 (React Component)
 
 ```tsx
 import React, { useRef, useState, useEffect } from 'react';
-import { Loader } from '@googlemaps/js-api-loader';
-import { useRouteReplay } from 'gm-route-replay-react';
+import { Loader } from "@googlemaps/js-api-loader";
+import { RouteReplay, RouteReplayHandle } from "gm-route-replay-react";
 import type { RouteInput } from 'gm-route-replay-core';
 
 function MapComponent() {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const [isMapApiLoaded, setIsMapApiLoaded] = useState(false);
-  const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
-  const mapId = 'YOUR_MAP_ID'; 
+  const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
+  const replayHandleRef = useRef<RouteReplayHandle>(null);
+  const apiKey = 'あなたのGoogle Maps APIキー'; // APIキーに置き換えてください
+  const mapId = 'あなたのMap ID'; // オプション: WebGLレンダラー使用時に必要
 
+  // Google Maps APIの読み込み
   useEffect(() => {
     const loader = new Loader({ apiKey, version: 'weekly', libraries: ['maps'] });
-    loader.load().then(() => setIsMapApiLoaded(true));
+    loader.importLibrary("maps").then((google) => {
+      const map = new google.Map(document.getElementById("map")!, {
+        center: { lat: 35.68, lng: 139.76 },
+        zoom: 15,
+        mapId: mapId,
+      });
+      setMapInstance(map);
+    });
   }, [apiKey]);
 
   const routeData: RouteInput = [
     { lat: 35.68, lng: 139.76, t: Date.now() },
     { lat: 35.68, lng: 139.77, t: Date.now() + 10000 },
-    // ... more points
+    // ... 他のポイント
   ];
-
-  const { state, controls } = useRouteReplay({
-    mapContainerRef,
-    isMapApiLoaded,
-    route: routeData,
-    rendererType: 'webgl',
-    mapId: mapId,
-  });
 
   return (
     <div>
-      <div ref={mapContainerRef} style={{ height: '400px', width: '100%' }} />
-      <button onClick={controls.play} disabled={!isMapApiLoaded || state.isPlaying}>
-        Play
+      <div id="map" style={{ height: '400px', width: '100%' }} />
+      {mapInstance && (
+        <RouteReplay
+          ref={replayHandleRef}
+          map={mapInstance}
+          route={routeData}
+          autoFit={true}
+        />
+      )}
+      <button onClick={() => replayHandleRef.current?.play()} disabled={!mapInstance}>
+        再生
       </button>
-      <button onClick={controls.pause} disabled={!isMapApiLoaded || !state.isPlaying}>
-        Pause
+      <button onClick={() => replayHandleRef.current?.pause()} disabled={!mapInstance}>
+        一時停止
       </button>
-      {/* Add more controls as needed */}
     </div>
   );
 }
