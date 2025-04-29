@@ -61,7 +61,7 @@ Sets the playback speed.
 Sets the camera follow mode.
 
 - `mode`: The new camera mode (`"center"` | `"ahead"` | `"none")`.
-See [CameraMode](../core/camera-mode.md) for details.
+See [`CameraMode`](../core/cameraMode.md) for details.
 
 ### `getDurationMs(): number`
 

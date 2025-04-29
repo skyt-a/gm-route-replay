@@ -60,7 +60,7 @@ The Google Map instance to display the replay on.
 - **Required:** `true`
 
 The route data to display. Format is `RoutePoint[]` or `{ [trackId: string]: RoutePoint[] }`.
-See [RouteInput Type](../core/route-input.md) for details.
+See [`RouteInput`](../core/routeInput.md) for details.
 
 ### `ref`
 
@@ -73,7 +73,7 @@ See [`RouteReplayHandle`](./route-replay-handle.md) for details.
 ### Optional Props
 
 You can pass the same options as the core library's `createPlayer` function (`PlayerOptions`) as props.
-See [PlayerOptions](../core/player-options.md) for details.
+See [`OverlayOptions`](../core/overlay-options.md) for details.
 
 Key options:
 
@@ -88,7 +88,7 @@ Key options:
 ### Event Handler Props
 
 You can pass callback functions as props corresponding to player events.
-See [Events](../core/events.md) for event payload details.
+See [`Events`](../core/events.md) for event payload details.
 
 - `onFrame?: (payload: PlayerEventMap['frame']) => void`: On frame update.
 - `onStart?: (payload: PlayerEventMap['start']) => void`: On playback start.

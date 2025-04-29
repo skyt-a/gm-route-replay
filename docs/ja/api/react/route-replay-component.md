@@ -60,7 +60,7 @@ function MyComponent() {
 - **必須:** `true`
 
 表示するルートデータ。`RoutePoint[]` または `{ [trackId: string]: RoutePoint[] }` の形式です。
-詳細は [RouteInput 型](../core/route-input.md) を参照してください。
+詳細は [`RouteInput`](../core/routeInput.md) を参照してください。
 
 ### `ref`
 
@@ -73,7 +73,7 @@ function MyComponent() {
 ### オプション Props
 
 コアライブラリの `createPlayer` 関数のオプション (`PlayerOptions`) と同じオプションを Props として渡すことができます。
-詳細は [PlayerOptions](../core/player-options.md) を参照してください。
+詳細は [`OverlayOptions`](../core/overlay-options.md) を参照してください。
 
 主なオプション:
 
@@ -88,7 +88,7 @@ function MyComponent() {
 ### イベントハンドラ Props
 
 プレイヤーのイベントに対応するコールバック関数を Props として渡すことができます。
-イベントペイロードの詳細は [イベント](../core/events.md) を参照してください。
+イベントペイロードの詳細は [`Events`](../core/events.md) を参照してください。
 
 - `onFrame?: (payload: PlayerEventMap['frame']) => void`: フレーム更新時
 - `onStart?: (payload: PlayerEventMap['start']) => void`: 再生開始時

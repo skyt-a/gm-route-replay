@@ -61,7 +61,7 @@ function MyComponent() {
 カメラの追従モードを設定します。
 
 - `mode`: 新しいカメラモード (`"center"` | `"ahead"` | `"none")。
-詳細は [CameraMode](../core/camera-mode.md) を参照してください。
+詳細は [`CameraMode`](../core/cameraMode.md) を参照してください。
 
 ### `getDurationMs(): number`
 
