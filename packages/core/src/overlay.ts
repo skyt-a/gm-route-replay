@@ -460,7 +460,7 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
       const currentPosition = { lat: focusPoint.lat, lng: focusPoint.lng };
 
       if (this.currentCameraMode === "center") {
-        map.panTo(currentPosition);
+        map.setCenter(currentPosition);
       } else if (
         this.currentCameraMode === "ahead" &&
         focusPoint.heading !== undefined
@@ -474,11 +474,11 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
           });
         } else {
           console.warn("Camera 'ahead' mode requires geometry library.");
-          map.panTo(currentPosition); // Fallback
+          map.setCenter(currentPosition); // Fallback
         }
       } else if (this.currentCameraMode === "ahead") {
         console.warn("Camera 'ahead' mode requires heading data.");
-        map.panTo(currentPosition); // Fallback
+        map.setCenter(currentPosition); // Fallback
       }
     }
   }
