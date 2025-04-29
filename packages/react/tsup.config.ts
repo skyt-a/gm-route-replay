@@ -4,7 +4,7 @@ export default defineConfig((options) => ({
   entry: ["src/index.ts"],
   outDir: "dist",
   target: "es2020",
-  format: ["esm", "cjs"], // No UMD for now
+  format: ["esm", "cjs"],
   splitting: false,
   sourcemap: true,
   clean: true,
@@ -13,7 +13,7 @@ export default defineConfig((options) => ({
   minify: !options.watch,
   treeshake: true,
   metafile: true,
-  globalName: "GmRouteReplayReact", // Assign appropriate globalName
+  globalName: "GmRouteReplayReact",
   esbuildOptions(options) {
     options.define = {
       "process.env.NODE_ENV": JSON.stringify(

@@ -44,10 +44,10 @@ import type { RouteInput } from 'gm-route-replay-core';
 function MapComponent() {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const replayHandleRef = useRef<RouteReplayHandle>(null);
-  const apiKey = 'あなたのGoogle Maps APIキー'; // APIキーに置き換えてください
-  const mapId = 'あなたのMap ID'; // オプション: WebGLレンダラー使用時に必要
+  const apiKey = 'あなたのGoogle Maps APIキー';
+  const mapId = 'あなたのMap ID';
 
-  // Google Maps APIの読み込み
+
   useEffect(() => {
     const loader = new Loader({ apiKey, version: 'weekly', libraries: ['maps'] });
     loader.importLibrary("maps").then((google) => {
@@ -63,7 +63,7 @@ function MapComponent() {
   const routeData: RouteInput = [
     { lat: 35.68, lng: 139.76, t: Date.now() },
     { lat: 35.68, lng: 139.77, t: Date.now() + 10000 },
-    // ... 他のポイント
+
   ];
 
   return (
@@ -124,7 +124,7 @@ function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 35.68, lng: 139.76 },
     zoom: 14,
-    mapId: 'YOUR_MAP_ID' // Optional: for WebGL renderer
+    mapId: 'YOUR_MAP_ID'
   });
 
   const routeData = [
@@ -141,10 +141,10 @@ function initMap() {
     autoFit: true,
   });
 
-  // マップにオーバーレイを設定
+
   replayOverlay.setMap(map);
 
-  // オーバーレイの準備ができてからコントロールを追加
+
   replayOverlay.addEventListener('ready', () => {
     document.getElementById('playBtn')?.addEventListener('click', () => replayOverlay?.play());
     document.getElementById('pauseBtn')?.addEventListener('click', () => replayOverlay?.pause());

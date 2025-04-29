@@ -1,13 +1,10 @@
 import { defineConfig } from "vitepress";
 
-// https://vitepress.dev/reference/site-config
 export default defineConfig({
-  // Shared configs
   title: "GM Route Replay",
   base: "/gm-route-replay/",
-  // Internationalization configuration
+
   locales: {
-    // Japanese Locale
     ja: {
       label: "日本語",
       lang: "ja",
@@ -73,12 +70,10 @@ export default defineConfig({
             "https://github.com/your-repo/gm-route-replay/edit/main/docs/:path",
           text: "このページを GitHub で編集",
         },
-        socialLinks: [
-          // { icon: 'github', link: 'https://github.com/your-repo/gm-route-replay' }
-        ],
+        socialLinks: [],
       },
     },
-    // English Locale (links already have /en/ prefix)
+
     en: {
       label: "English",
       lang: "en",
@@ -144,9 +139,7 @@ export default defineConfig({
             "https://github.com/your-repo/gm-route-replay/edit/main/docs/:path",
           text: "Edit this page on GitHub",
         },
-        socialLinks: [
-          // { icon: 'github', link: 'https://github.com/your-repo/gm-route-replay' }
-        ],
+        socialLinks: [],
       },
     },
   },

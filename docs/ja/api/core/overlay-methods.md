@@ -28,17 +28,17 @@
 ```typescript
 const player: PlayerHandle = createPlayer(options);
 
-// 再生・一時停止ボタン
+
 document.getElementById('playButton').addEventListener('click', () => player.play());
 document.getElementById('pauseButton').addEventListener('click', () => player.pause());
 
-// スピード変更スライダー
+
 document.getElementById('speedSlider').addEventListener('input', (event) => {
   const speed = parseFloat((event.target as HTMLInputElement).value);
   player.setSpeed(speed);
 });
 
-// イベントの購読
+
 player.on('frame', (payload) => {
   console.log(`Frame at progress: ${payload.progress.toFixed(2)}`);
 });
@@ -47,7 +47,7 @@ player.on('finish', () => {
   console.log('Playback finished!');
 });
 
-// クリーンアップ
+
 window.addEventListener('beforeunload', () => {
   player.destroy();
 });
@@ -100,24 +100,24 @@ window.addEventListener('beforeunload', () => {
 ```typescript
 import { GmRouteReplayOverlay } from 'gm-route-replay-core';
 
-// ... overlay インスタンスの作成とマップへの追加 ...
+
 const overlay = new GmRouteReplayOverlay(options);
 overlay.setMap(map);
 
 overlay.addEventListener('ready', () => {
-  // 再生・一時停止ボタン
+
   document.getElementById('playButton').addEventListener('click', () => overlay.play());
   document.getElementById('pauseButton').addEventListener('click', () => overlay.pause());
 
-  // スピード変更スライダー
+
   document.getElementById('speedSlider').addEventListener('input', (event) => {
     const speed = parseFloat((event.target as HTMLInputElement).value);
     overlay.setSpeed(speed);
   });
 
-  // イベントの購読
+
   overlay.addEventListener('frame', (payload) => {
-    console.log(`Frame at progress: ${overlay.currentProgress.toFixed(2)}`); // プロパティも使用可能
+    console.log(`Frame at progress: ${overlay.currentProgress.toFixed(2)}`);
   });
 
   overlay.addEventListener('finish', () => {
@@ -125,8 +125,8 @@ overlay.addEventListener('ready', () => {
   });
 });
 
-// クリーンアップ
+
 window.addEventListener('beforeunload', () => {
-  overlay.setMap(null); // または overlay.destroy();
+  overlay.setMap(null);
 });
 ``` 

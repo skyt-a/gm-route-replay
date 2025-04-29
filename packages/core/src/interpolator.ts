@@ -28,7 +28,7 @@ export interface InterpolatedPoint {
   lat: number;
   lng: number;
   heading?: number;
-  /** Progress along the entire route (0.0 to 1.0) */
+
   progress: number;
 }
 
@@ -48,11 +48,9 @@ export function interpolateRoute(
   startTimeMs: number,
   durationMs: number
 ): InterpolatedPoint | null {
-  // --- Time bounds check using absolute time ---
   const endTimeMs = startTimeMs + durationMs;
 
   if (absoluteTimeMs <= startTimeMs && route.length > 0) {
-    // Calculate heading from first segment if needed
     let heading = route[0].heading;
     if (
       heading === undefined &&
@@ -73,7 +71,7 @@ export function interpolateRoute(
   }
   if (absoluteTimeMs >= endTimeMs && route.length > 0) {
     const lastPoint = route[route.length - 1];
-    // Calculate heading from last segment if needed
+
     let heading = lastPoint.heading;
     if (
       heading === undefined &&
@@ -100,11 +98,9 @@ export function interpolateRoute(
   ) {
     return null;
   }
-  // --- End Time bounds check ---
 
   const targetTimestamp = absoluteTimeMs;
 
-  // Find the segment [p1, p2]
   let p1: RoutePoint | null = null;
   let p2: RoutePoint | null = null;
   for (let i = 0; i < route.length - 1; i++) {
@@ -131,7 +127,6 @@ export function interpolateRoute(
     return null;
   }
 
-  // Calculate interpolation factor 't'
   const segmentDuration = p2.t - p1.t;
   const t =
     segmentDuration > 0 ? (targetTimestamp - p1.t) / segmentDuration : 1.0;
@@ -140,27 +135,19 @@ export function interpolateRoute(
   const lng = lerp(p1.lng, p2.lng, t);
   let heading: number | undefined = undefined;
 
-  // --- Heading calculation/interpolation ---
   if (p1.heading !== undefined && p2.heading !== undefined) {
-    // Interpolate if both points have heading
     heading = interpolateHeading(p1.heading, p2.heading, t);
   } else if (p1.heading !== undefined && segmentDuration === 0) {
-    // If segment duration is 0, use p1's heading if available
     heading = p1.heading;
   } else if (typeof google?.maps?.geometry?.spherical !== "undefined") {
-    // Calculate heading from segment direction if geometry library is loaded
-    // Avoid calculation for zero-length segments to prevent NaN heading
     if (p1.lat !== p2.lat || p1.lng !== p2.lng) {
       heading = google.maps.geometry.spherical.computeHeading(p1, p2);
     } else {
-      // Use previous point's heading or p1's heading if available
-      heading = p1.heading; // Fallback to p1's heading if segment has zero length
+      heading = p1.heading;
     }
   } else {
-    // Fallback: Use start point's heading if available, otherwise undefined
     heading = p1.heading;
   }
-  // --- End Heading calculation ---
 
   const progress =
     durationMs > 0

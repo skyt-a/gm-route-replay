@@ -23,7 +23,7 @@
 `PlayerOptions` で初期値を設定するか、`PlayerHandle` の `setCameraMode` メソッドで動的に変更します。
 
 ```typescript
-// 初期設定
+
 const player = createPlayer({
   map: map,
   route: routeData,
@@ -31,6 +31,6 @@ const player = createPlayer({
   cameraOptions: { aheadDistance: 120, defaultTilt: 50 }
 });
 
-// 動的な変更
+
 player.setCameraMode('center');
 ``` 

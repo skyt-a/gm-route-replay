@@ -24,13 +24,13 @@ Type definitions for the callback function and its payload (arguments) correspon
 interface PlayerEventMap {
   start: () => void;
   frame: (payload: {
-    trackId: string | number; // trackId for Multi-track, 0 (provisional) for Single-track
+    trackId: string | number;
     pos: google.maps.LatLngLiteral;
     heading?: number;
-    progress: number; // Overall progress (0.0 ~ 1.0)
+    progress: number;
   }) => void;
   pause: () => void;
-  seek: (payload: { timeMs: number }) => void; // Seek target time (ms)
+  seek: (payload: { timeMs: number }) => void;
   finish: () => void;
   error: (payload: { error: Error }) => void;
 }
@@ -52,23 +52,23 @@ const player = createPlayer(options);
 
 player.on('start', () => {
   console.log('Playback started');
-  // Update UI state, etc.
+
 });
 
 player.on('frame', ({ trackId, pos, progress }) => {
-  // Display current position or progress, etc.
+
   document.getElementById('progressBar').style.width = `${progress * 100}%`;
-  // trackId is available for Multi-track
+
   console.log(`Track ${trackId} is at ${pos.lat}, ${pos.lng}`);
 });
 
 player.on('finish', () => {
   console.log('Playback finished');
-  // Re-enable play button, etc.
+
 });
 
 player.on('error', ({ error }) => {
   console.error('Player error:', error);
-  // Display error message, etc.
+
 });
 ``` 

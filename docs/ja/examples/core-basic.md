@@ -46,20 +46,20 @@ import { createPlayer } from 'gm-route-replay-core';
 let map;
 let player;
 
-// この関数は Google Maps スクリプトのロードによって呼び出されます (callback=initMap)
+
 function initMap() {
   console.log('マップを初期化中...');
   map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: 35.68, lng: 139.76 }, // 初期中心座標 (例: 東京駅)
+    center: { lat: 35.68, lng: 139.76 },
     zoom: 14,
     mapId: 'YOUR_MAP_ID' // オプション: rendererType: 'webgl' を使う場合に必要
   });
 
-  // サンプルルートデータ (正方形)
+
   const startTime = Date.now();
   const routeData = [
     { lat: 35.680, lng: 139.760, t: startTime },
-    { lat: 35.680, lng: 139.770, t: startTime + 10000, heading: 90 }, // 東へ
+    { lat: 35.680, lng: 139.770, t: startTime + 10000, heading: 90 },
     { lat: 35.685, lng: 139.770, t: startTime + 20000, heading: 0 },  // 北へ
     { lat: 35.685, lng: 139.760, t: startTime + 30000, heading: 270 },// 西へ
     { lat: 35.680, lng: 139.760, t: startTime + 40000, heading: 180 },// 南へ (スタート地点に戻る)
@@ -72,28 +72,28 @@ function initMap() {
       route: routeData,
       autoFit: true,          // ルートに合わせて自動で地図範囲を調整
       initialSpeed: 1,        // 通常の再生速度
-      // rendererType: 'webgl', // WebGL レンダラーを使う場合はコメント解除
-      // mapId: 'YOUR_MAP_ID',   // WebGL を使う場合に必要
+
+
       cameraMode: 'center',   // マーカーを中央に保つ
       polylineOptions: {      // 軌跡を描画する
-        strokeColor: '#0000FF', // 青色
+        strokeColor: '#0000FF',
         strokeWeight: 3,
       },
       markerOptions: {        // マーカーをカスタマイズ (オプション)
-        // icon: 'path/to/your/icon.png'
+
       }
     });
 
-    // コントロールの設定
+
     document.getElementById('playBtn')?.addEventListener('click', () => player?.play());
     document.getElementById('pauseBtn')?.addEventListener('click', () => player?.pause());
     document.getElementById('stopBtn')?.addEventListener('click', () => player?.stop());
 
     console.log('プレイヤーが正常に作成されました:', player);
 
-    // イベントリスニングの例
+
     player.on('frame', (payload) => {
-      // console.log(`フレーム進行度: ${payload.progress.toFixed(3)}`);
+
     });
     player.on('finish', () => {
       console.log('再生が完了しました！');
@@ -105,7 +105,7 @@ function initMap() {
   }
 }
 
-// Google Maps スクリプトのコールバックからアクセスできるように initMap をグローバルにする
+
 window.initMap = initMap;
 ```
 

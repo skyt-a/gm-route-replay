@@ -23,7 +23,7 @@ Specifies how the player's camera follows the marker (current position) on the m
 Set the initial value in `PlayerOptions` or change it dynamically using the `setCameraMode` method of `PlayerHandle`.
 
 ```typescript
-// Initial setting
+
 const player = createPlayer({
   map: map,
   route: routeData,
@@ -31,6 +31,6 @@ const player = createPlayer({
   cameraOptions: { aheadDistance: 120, defaultTilt: 50 }
 });
 
-// Dynamic change
+
 player.setCameraMode('center');
 ``` 

@@ -75,12 +75,12 @@ const polylineOptionsConfig: google.maps.PolylineOptions = {
 
 function App() {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID; // Read Map ID from env
+  const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [error, setError] = useState<string | null>(null);
   const replayHandleRef = useRef<RouteReplayHandle>(null);
 
-  // State for playback control and display
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [speed, setSpeed] = useState(1);
@@ -88,17 +88,17 @@ function App() {
   const [currentCameraMode, setCurrentCameraMode] = useState<CameraMode>("center");
   const [isSeeking, setIsSeeking] = useState(false);
 
-  // Effect to handle map loading
+
   useEffect(() => {
     if (!apiKey) {
       setError("Missing VITE_GOOGLE_MAPS_API_KEY in .env file");
       return;
     }
-    // Consider adding WebGL check if needed based on options
+
     const loader = new Loader({
       apiKey: apiKey,
       version: "weekly",
-      libraries: ["maps", "geometry"], // ADDED geometry library
+      libraries: ["maps", "geometry"],
     });
     loader
       .importLibrary("maps")
@@ -108,7 +108,7 @@ function App() {
           const map = new google.Map(document.getElementById("map")!, {
             center: { lat: 35.68, lng: 139.76 },
             zoom: 15,
-            disableDefaultUI: true, // Example: customize UI
+            disableDefaultUI: true,
             mapId: mapId,
           });
           setMapInstance(map);
@@ -120,7 +120,7 @@ function App() {
       });
   }, [apiKey, mapId, mapInstance]);
 
-  // --- Event Handlers for <RouteReplay> Component ---
+
   const handleFrame: PlayerEventMap["frame"] = useCallback(
     (payload) => {
       if (!isSeeking) {
@@ -158,7 +158,7 @@ function App() {
     setIsPlaying(false);
   }, []);
 
-  // --- Control Callbacks using the ref ---
+
   const handlePlay = useCallback(() => replayHandleRef.current?.play(), []);
   const handlePauseControl = useCallback(() => replayHandleRef.current?.pause(), []);
   const handleStop = useCallback(() => {
@@ -186,7 +186,7 @@ function App() {
     []
   );
 
-  // Callback for camera mode change
+
   const handleCameraModeChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const mode = event.target.value as CameraMode;
@@ -196,7 +196,7 @@ function App() {
     []
   );
 
-  // --- Seek Bar Handlers ---
+
   const handleSeekInput = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setIsSeeking(true);
@@ -217,24 +217,22 @@ function App() {
     [durationMs]
   );
 
-  // --- Conditional rendering based on error (this is fine) ---
+
   if (error) {
     return <div className="error">Error: {error}</div>;
   }
 
   const isReady = !!mapInstance && durationMs > 0;
 
-  // --- JSX return ---
+
   return (
     <>
       <h1>gm-route-replay React Example (Multi-Track)</h1>
-      {/* Map container */}
       <div
         id="map"
         style={{ height: "500px", width: "100%" }}
       ></div>
 
-      {/* RouteReplay Component */}
       {mapInstance && (
         <RouteReplay
           ref={replayHandleRef}
@@ -245,7 +243,7 @@ function App() {
           polylineOptions={polylineOptionsConfig}
           initialSpeed={1}
           cameraMode={"center"}
-          // Event Handlers
+
           onFrame={handleFrame}
           onStart={handleStart}
           onPause={handlePause}
@@ -255,12 +253,10 @@ function App() {
         />
       )}
 
-      {/* Controls (Simplified - adapt as needed) */}
       <div className="controls">
         <button onClick={handlePlay} disabled={isPlaying || !isReady}>Play</button>
         <button onClick={handlePauseControl} disabled={!isPlaying || !isReady}>Pause</button>
         <button onClick={handleStop} disabled={!isReady}>Stop</button>
-        {/* Add more controls like speed, seek bar, camera mode here */}
       </div>
     </>
   );

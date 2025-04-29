@@ -10,8 +10,6 @@
     "baseUrl": ".",
     "types": ["node"]
   },
-  "files": [],
-  "references": [{ "path": "./packages/core" }, { "path": "./packages/react" }],
   "include": ["packages/*/src/**/*", "tsup.config.ts", "vitest.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

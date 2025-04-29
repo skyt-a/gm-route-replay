@@ -25,7 +25,7 @@ import type { RouteInput } from 'gm-route-replay-core';
 function MyMapComponent() {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const replayHandleRef = useRef<RouteReplayHandle>(null);
-  const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace
+  const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
 
   useEffect(() => {
     const loader = new Loader({ apiKey, version: 'weekly', libraries: ['maps'] });

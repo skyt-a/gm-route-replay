@@ -45,24 +45,24 @@ Methods and properties available on an instance of the `GmRouteReplayOverlay` cl
 ```typescript
 import { GmRouteReplayOverlay } from 'gm-route-replay-core';
 
-// ... create overlay instance and add to map ...
+
 const overlay = new GmRouteReplayOverlay(options);
 overlay.setMap(map);
 
 overlay.addEventListener('ready', () => {
-  // Play/Pause buttons
+
   document.getElementById('playButton').addEventListener('click', () => overlay.play());
   document.getElementById('pauseButton').addEventListener('click', () => overlay.pause());
 
-  // Speed slider
+
   document.getElementById('speedSlider').addEventListener('input', (event) => {
     const speed = parseFloat((event.target as HTMLInputElement).value);
     overlay.setSpeed(speed);
   });
 
-  // Subscribe to events
+
   overlay.addEventListener('frame', (payload) => {
-    console.log(`Frame at progress: ${overlay.currentProgress.toFixed(2)}`); // Properties are also available
+    console.log(`Frame at progress: ${overlay.currentProgress.toFixed(2)}`);
   });
 
   overlay.addEventListener('finish', () => {
@@ -70,8 +70,8 @@ overlay.addEventListener('ready', () => {
   });
 });
 
-// Cleanup
+
 window.addEventListener('beforeunload', () => {
-  overlay.setMap(null); // or overlay.destroy();
+  overlay.setMap(null);
 });
 ``` 

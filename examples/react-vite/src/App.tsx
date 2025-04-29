@@ -59,7 +59,6 @@ const multiTrackRouteData: RouteInput = {
   track1: createSquareRoute(now, 35.68, 139.76, 0.01, 20, 0),
   track2: createSquareRoute(now + 5000, 35.685, 139.77, 0.005, 15, 45),
   track3: [
-    // Simple line segment track
     { lat: 35.67, lng: 139.75, t: now + 2000, heading: 45 },
     { lat: 35.675, lng: 139.755, t: now + 12000, heading: 45 },
   ],
@@ -181,7 +180,7 @@ function App() {
 
   const handleSetCameraMode = useCallback((mode: CameraMode) => {
     replayHandleRef.current?.setCameraMode(mode);
-    setCurrentCameraMode(mode); // Keep this to update button states
+    setCurrentCameraMode(mode);
   }, []);
 
   const handleSeekInput = useCallback(
@@ -213,7 +212,6 @@ function App() {
 
   return (
     <>
-      <h1>gm-route-replay React Example (Component)</h1>
       <div
         id="map"
         style={{ height: "500px", width: "100%", marginBottom: "0rem" }}
@@ -238,9 +236,7 @@ function App() {
         />
       )}
 
-      {/* --- Video Player Style Controls --- */}
       <div className="player-controls">
-        {/* Play/Pause/Stop Group */}
         <div className="control-group playback-controls">
           <button onClick={handlePlay} disabled={isPlaying || !isReady}>
             ▶️
@@ -276,9 +272,7 @@ function App() {
           </span>
         </div>
 
-        {/* Settings Group (Speed, Camera) */}
         <div className="control-group settings-controls">
-          {/* Speed Control (Simplified for now) */}
           <div className="speed-control">
             <span>Speed:</span>
             <button onClick={() => handleSetSpeed(0.5)} disabled={!isReady}>
@@ -290,10 +284,8 @@ function App() {
             <button onClick={() => handleSetSpeed(2)} disabled={!isReady}>
               2x
             </button>
-            {/* Range slider could be added back here or in a popup */}
           </div>
 
-          {/* Camera Mode Control (Simplified for now) */}
           <div className="camera-control">
             <span>Camera:</span>
             <button
@@ -314,18 +306,9 @@ function App() {
             >
               None
             </button>
-            {/* Radio buttons could be added back here or in a popup */}
           </div>
         </div>
       </div>
-      {/* --- End Video Player Style Controls --- */}
-
-      <p style={{ marginTop: "1rem" }}>
-        <em>
-          Note: Ensure VITE_GOOGLE_MAPS_API_KEY{" "}
-          {mapId && "and VITE_GOOGLE_MAPS_MAP_ID "}in .env
-        </em>
-      </p>
     </>
   );
 }

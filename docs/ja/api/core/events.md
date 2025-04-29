@@ -24,13 +24,13 @@ type PlayerEvent =
 interface PlayerEventMap {
   start: () => void;
   frame: (payload: {
-    trackId: string | number; // Multi-track の場合は trackId, Single-track の場合は 0 (仮)
+    trackId: string | number;
     pos: google.maps.LatLngLiteral;
     heading?: number;
-    progress: number; // 全体の進行度 (0.0 ~ 1.0)
+    progress: number;
   }) => void;
   pause: () => void;
-  seek: (payload: { timeMs: number }) => void; // シーク先の時間 (ms)
+  seek: (payload: { timeMs: number }) => void;
   finish: () => void;
   error: (payload: { error: Error }) => void;
 }
@@ -52,23 +52,23 @@ const player = createPlayer(options);
 
 player.on('start', () => {
   console.log('Playback started');
-  // UI の状態を更新するなど
+
 });
 
 player.on('frame', ({ trackId, pos, progress }) => {
-  // 現在位置や進行度を表示するなど
+
   document.getElementById('progressBar').style.width = `${progress * 100}%`;
-  // Multi-track の場合は trackId も利用可能
+
   console.log(`Track ${trackId} is at ${pos.lat}, ${pos.lng}`);
 });
 
 player.on('finish', () => {
   console.log('Playback finished');
-  // 再生ボタンを再度有効にするなど
+
 });
 
 player.on('error', ({ error }) => {
   console.error('Player error:', error);
-  // エラーメッセージを表示するなど
+
 });
 ``` 

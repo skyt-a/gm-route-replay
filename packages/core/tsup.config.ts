@@ -1,18 +1,18 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig((options) => ({
-  entry: ["src/index.ts"], // Explicit entry point
+  entry: ["src/index.ts"],
   outDir: "dist",
   target: "es2020",
-  format: ["esm", "cjs"], // Removed 'umd' temporarily
+  format: ["esm", "cjs"],
   splitting: false,
   sourcemap: true,
   clean: true,
-  tsconfig: "./tsconfig.json", // Explicitly specify the tsconfig file
+  tsconfig: "./tsconfig.json",
   minify: !options.watch,
   treeshake: true,
-  metafile: true, // Keep metafile for core/react
-  globalName: "GmRouteReplayCore", // Assign appropriate globalName
+  metafile: true,
+  globalName: "GmRouteReplayCore",
   esbuildOptions(options) {
     options.define = {
       "process.env.NODE_ENV": JSON.stringify(

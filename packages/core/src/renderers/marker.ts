@@ -1,38 +1,32 @@
-/// <reference types="@types/google.maps" />
-
-import type { IRenderer } from "./types"; // Import the interface
+import type { IRenderer } from "./types";
 import type { PlayerOptions } from "../types";
 
 interface MarkerRendererOptions {
   map: google.maps.Map;
-  markerOptions?: google.maps.MarkerOptions; // Base options for all markers
+  markerOptions?: google.maps.MarkerOptions;
 }
 
 export class MarkerRenderer implements IRenderer {
-  // Implement IRenderer
   private map: google.maps.Map;
   private baseMarkerOptions: google.maps.MarkerOptions;
   private markers = new Map<string, google.maps.Marker>();
-  // Store last known headings for smooth updates when position doesn't change
+
   private lastHeadings = new Map<string, number | undefined>();
 
   constructor({ map, markerOptions }: MarkerRendererOptions) {
     this.map = map;
-    // Default options, easily customizable
+
     this.baseMarkerOptions = {
       clickable: false,
       crossOnDrag: false,
       ...(markerOptions || {}),
-      position: { lat: 0, lng: 0 }, // Initial position, will be updated
-      map: null, // Keep null initially
+      position: { lat: 0, lng: 0 },
+      map: null,
     };
     console.log("MarkerRenderer initialized (implements IRenderer).");
   }
 
-  /** Mounts markers to the map (makes existing markers visible). */
   mount(): void {
-    // This ensures markers created *before* mount are added to the map.
-    // Markers created by updateMarker are added immediately.
     this.markers.forEach((marker) => {
       if (!marker.getMap()) {
         marker.setMap(this.map);
@@ -56,28 +50,24 @@ export class MarkerRenderer implements IRenderer {
     let marker = this.markers.get(trackId);
 
     if (position === null) {
-      // Hide or remove marker if position is null
       if (marker) {
         marker.setMap(null);
         this.markers.delete(trackId);
         this.lastHeadings.delete(trackId);
-        // console.log(`Marker removed for track ${trackId}`);
       }
       return;
     }
 
     if (!marker) {
-      // Create marker if it doesn't exist
       marker = new google.maps.Marker({
         ...this.baseMarkerOptions,
-        // Consider allowing per-track options overrides here later
+
         position: position,
-        map: this.map, // Add to map on creation
+        map: this.map,
       });
       this.markers.set(trackId, marker);
       console.log(`Marker created for track ${trackId}`);
     } else {
-      // Update existing marker position only if it changed
       const currentPos = marker.getPosition();
       if (
         !currentPos ||
@@ -88,11 +78,8 @@ export class MarkerRenderer implements IRenderer {
       }
     }
 
-    // Update icon rotation (heading) if provided and different
     const lastHeading = this.lastHeadings.get(trackId);
     if (heading !== undefined && heading !== lastHeading) {
-      // Assuming the marker icon has a rotation property
-      // Standard markers don't rotate; requires Symbol icon
       const icon = marker.getIcon() as google.maps.Symbol | null | undefined;
       if (icon && typeof icon === "object" && "rotation" in icon) {
         marker.setIcon({
@@ -105,7 +92,6 @@ export class MarkerRenderer implements IRenderer {
         typeof this.baseMarkerOptions.icon === "object" &&
         "path" in this.baseMarkerOptions.icon
       ) {
-        // If no icon set, but base options has a Symbol, apply rotation to it
         marker.setIcon({
           ...(this.baseMarkerOptions.icon as google.maps.Symbol),
           rotation: heading,
@@ -114,7 +100,6 @@ export class MarkerRenderer implements IRenderer {
       this.lastHeadings.set(trackId, heading);
     }
 
-    // Ensure map is set when creating/updating
     if (!marker.getMap()) {
       marker.setMap(this.map);
     }
@@ -140,7 +125,6 @@ export class MarkerRenderer implements IRenderer {
   removeAllMarkers(): void {
     this.markers.forEach((marker, trackId) => {
       marker.setMap(null);
-      // console.log(`Removing marker for track ${trackId}`);
     });
     this.markers.clear();
     this.lastHeadings.clear();

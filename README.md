@@ -44,10 +44,10 @@ import type { RouteInput } from 'gm-route-replay-core';
 function MapComponent() {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const replayHandleRef = useRef<RouteReplayHandle>(null);
-  const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with your API key
-  const mapId = 'YOUR_MAP_ID'; // Optional: Required for WebGL renderer
+  const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
+  const mapId = 'YOUR_MAP_ID';
 
-  // Load Google Maps API
+
   useEffect(() => {
     const loader = new Loader({ apiKey, version: 'weekly', libraries: ['maps'] });
     loader.importLibrary("maps").then((google) => {
@@ -63,7 +63,7 @@ function MapComponent() {
   const routeData: RouteInput = [
     { lat: 35.68, lng: 139.76, t: Date.now() },
     { lat: 35.68, lng: 139.77, t: Date.now() + 10000 },
-    // ... more points
+
   ];
 
   return (
@@ -75,9 +75,9 @@ function MapComponent() {
           map={mapInstance}
           route={routeData}
           autoFit={true}
-          // Options can be passed here
-          // markerOptions={{...}}
-          // polylineOptions={{...}}
+
+
+
         />
       )}
       <button onClick={() => replayHandleRef.current?.play()} disabled={!mapInstance}>
@@ -86,7 +86,6 @@ function MapComponent() {
       <button onClick={() => replayHandleRef.current?.pause()} disabled={!mapInstance}>
         Pause
       </button>
-      {/* Add more controls as needed */}
     </div>
   );
 }
@@ -124,12 +123,12 @@ import { GmRouteReplayOverlay } from 'gm-route-replay-core';
 let map;
 let replayOverlay;
 
-// This function is called by the Google Maps script load
+
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 35.68, lng: 139.76 },
     zoom: 14,
-    mapId: 'YOUR_MAP_ID' // Optional: for WebGL renderer
+    mapId: 'YOUR_MAP_ID' 
   });
 
   const routeData = [
@@ -144,13 +143,13 @@ function initMap() {
     map: map,
     route: routeData,
     autoFit: true,
-    // Add other options as needed
+
   });
 
-  // Set the overlay on the map
+
   replayOverlay.setMap(map);
 
-  // Add controls after the overlay is ready
+
   replayOverlay.addEventListener('ready', () => {
     document.getElementById('playBtn')?.addEventListener('click', () => replayOverlay?.play());
     document.getElementById('pauseBtn')?.addEventListener('click', () => replayOverlay?.pause());

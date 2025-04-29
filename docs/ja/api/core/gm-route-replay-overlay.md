@@ -33,27 +33,27 @@ const routeData = [
 ];
 
 const replayOverlay = new GmRouteReplayOverlay({
-  map: map, // map を渡す必要があります
+  map: map,
   route: routeData,
   initialSpeed: 2,
   cameraMode: 'ahead',
-  // ... other options
+
 });
 
-// マップにオーバーレイを追加（これにより onAdd が呼ばれ初期化される）
+
 replayOverlay.setMap(map);
 
-// 初期化後にメソッドを呼び出す (例: イベントリスナーや isReady() で確認後)
+
 replayOverlay.addEventListener('ready', () => {
   console.log('Player is ready!');
   replayOverlay.play();
 });
 
-// または isReady() で確認
+
 if (replayOverlay.isReady()) {
   replayOverlay.play();
 } else {
-  // まだ準備できていない場合の処理
+
 }
 ```
 

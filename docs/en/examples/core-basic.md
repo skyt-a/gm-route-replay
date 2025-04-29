@@ -46,20 +46,20 @@ import { createPlayer } from 'gm-route-replay-core';
 let map;
 let player;
 
-// This function is called by the Google Maps script load (callback=initMap)
+
 function initMap() {
   console.log('Initializing map...');
   map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: 35.68, lng: 139.76 }, // Initial center (e.g., Tokyo Station)
+    center: { lat: 35.68, lng: 139.76 },
     zoom: 14,
     mapId: 'YOUR_MAP_ID' // Optional: Required if using rendererType: 'webgl'
   });
 
-  // Sample route data (a square)
+
   const startTime = Date.now();
   const routeData = [
     { lat: 35.680, lng: 139.760, t: startTime },
-    { lat: 35.680, lng: 139.770, t: startTime + 10000, heading: 90 }, // East
+    { lat: 35.680, lng: 139.770, t: startTime + 10000, heading: 90 },
     { lat: 35.685, lng: 139.770, t: startTime + 20000, heading: 0 },  // North
     { lat: 35.685, lng: 139.760, t: startTime + 30000, heading: 270 },// West
     { lat: 35.680, lng: 139.760, t: startTime + 40000, heading: 180 },// South (back to start)
@@ -72,28 +72,28 @@ function initMap() {
       route: routeData,
       autoFit: true,          // Automatically adjust map bounds to fit the route
       initialSpeed: 1,        // Normal playback speed
-      // rendererType: 'webgl', // Uncomment to use WebGL renderer
-      // mapId: 'YOUR_MAP_ID',   // Required if using WebGL
+
+
       cameraMode: 'center',   // Keep the marker centered
       polylineOptions: {      // Draw the path
-        strokeColor: '#0000FF', // Blue color
+        strokeColor: '#0000FF',
         strokeWeight: 3,
       },
       markerOptions: {        // Customize the marker (optional)
-        // icon: 'path/to/your/icon.png'
+
       }
     });
 
-    // Setup controls
+
     document.getElementById('playBtn')?.addEventListener('click', () => player?.play());
     document.getElementById('pauseBtn')?.addEventListener('click', () => player?.pause());
     document.getElementById('stopBtn')?.addEventListener('click', () => player?.stop());
 
     console.log('Player created successfully:', player);
 
-    // Example of listening to events
+
     player.on('frame', (payload) => {
-      // console.log(`Frame progress: ${payload.progress.toFixed(3)}`);
+
     });
     player.on('finish', () => {
       console.log('Playback finished!');
@@ -105,7 +105,7 @@ function initMap() {
   }
 }
 
-// Make initMap globally accessible for the Google Maps script callback
+
 window.initMap = initMap;
 ```
 

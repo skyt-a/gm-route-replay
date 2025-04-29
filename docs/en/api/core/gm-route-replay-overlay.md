@@ -33,27 +33,27 @@ const routeData = [
 ];
 
 const replayOverlay = new GmRouteReplayOverlay({
-  map: map, // map is required here
+  map: map,
   route: routeData,
   initialSpeed: 2,
   cameraMode: 'ahead',
-  // ... other options
+
 });
 
-// Add the overlay to the map (this calls onAdd and initializes)
+
 replayOverlay.setMap(map);
 
-// Call methods after initialization (e.g., after checking with event listener or isReady())
+
 replayOverlay.addEventListener('ready', () => {
   console.log('Player is ready!');
   replayOverlay.play();
 });
 
-// Or check with isReady()
+
 if (replayOverlay.isReady()) {
   replayOverlay.play();
 } else {
-  // Handle the case where it's not ready yet
+
 }
 ```
 

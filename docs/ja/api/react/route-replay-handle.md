@@ -9,7 +9,7 @@ import { RouteReplay, RouteReplayHandle } from 'gm-route-replay-react';
 
 function MyComponent() {
   const replayHandleRef = useRef<RouteReplayHandle>(null);
-  // ... 他のセットアップ ...
+
 
   const handlePlay = () => {
     replayHandleRef.current?.play();

@@ -10,7 +10,7 @@ import { RoutePoint } from './types';
 type RouteInput =
   | RoutePoint[] // Single route
   | { [trackId: string]: RoutePoint[] } // Multiple routes (Multi-track)
-  | string; // URL containing route data (currently not implemented)
+  | string;
 ```
 
 ## Formats

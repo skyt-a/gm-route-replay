@@ -12,7 +12,7 @@ function MyComponent() {
   const replayHandleRef = useRef<RouteReplayHandle>(null);
   const routeData: RouteInput = [/* ... */];
 
-  // Initialize map instance ...
+
 
   return (
     <>
@@ -22,13 +22,13 @@ function MyComponent() {
           ref={replayHandleRef}
           map={mapInstance}
           route={routeData}
-          // Options
+
           autoFit={true}
           initialSpeed={2}
           cameraMode="ahead"
           markerOptions={{ /* ... */ }}
           polylineOptions={{ /* ... */ }}
-          // Event Handlers
+
           onFrame={(payload) => console.log('Frame:', payload.progress)}
           onStart={() => console.log('Started')}
           onPause={() => console.log('Paused')}
@@ -36,7 +36,6 @@ function MyComponent() {
           onError={(payload) => console.error('Error:', payload.error)}
         />
       )}
-      {/* Control buttons, etc. */}
       <button onClick={() => replayHandleRef.current?.play()}>Play</button>
     </>
   );

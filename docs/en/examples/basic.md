@@ -11,8 +11,8 @@ import { RouteReplay, RouteReplayHandle } from "gm-route-replay-react";
 import type { RoutePoint, RouteInput, CameraMode, PlayerEventMap } from "gm-route-replay-core";
 import "./App.css";
 
-// --- Sample Data & Config (Outside Component) ---
-// Function to create a simple square route
+
+
 const createSquareRoute = (
   startTime: number,
   latStart: number,
@@ -58,38 +58,38 @@ const createSquareRoute = (
   return points;
 };
 
-// --- Create Multi-Track Sample Data ---
+
 const now = Date.now();
 const multiTrackRouteData: RouteInput = {
-  track1: createSquareRoute(now, 35.68, 139.76, 0.01, 20, 0), // Square near Tokyo Station
-  track2: createSquareRoute(now + 5000, 35.685, 139.77, 0.005, 15, 45), // Smaller, faster square starting 5s later, offset heading
+  track1: createSquareRoute(now, 35.68, 139.76, 0.01, 20, 0),
+  track2: createSquareRoute(now + 5000, 35.685, 139.77, 0.005, 15, 45),
   track3: [
-    // Simple line segment track
+
     { lat: 35.67, lng: 139.75, t: now + 2000, heading: 45 },
     { lat: 35.675, lng: 139.755, t: now + 12000, heading: 45 },
   ],
 };
-// --- End Multi-Track Sample Data ---
 
-// Stable config objects
+
+
 const markerOptionsConfig: google.maps.MarkerOptions = {
-  // title: "Replay Vehicle", // Title might be less useful for multi-track
-  // We might want different icons per track later
+
+
 };
 const polylineOptionsConfig: google.maps.PolylineOptions = {
-  strokeColor: "#FF0000", // Default color, might want per-track colors later
+  strokeColor: "#FF0000",
   strokeOpacity: 0.8,
   strokeWeight: 4,
 };
 
 function App() {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID; // Read Map ID from env
+  const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID;
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [error, setError] = useState<string | null>(null);
   const replayHandleRef = useRef<RouteReplayHandle>(null);
 
-  // State for playback control and display
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [speed, setSpeed] = useState(1);
@@ -97,17 +97,17 @@ function App() {
   const [currentCameraMode, setCurrentCameraMode] = useState<CameraMode>("center");
   const [isSeeking, setIsSeeking] = useState(false);
 
-  // Effect to handle map loading
+
   useEffect(() => {
     if (!apiKey) {
       setError("Missing VITE_GOOGLE_MAPS_API_KEY in .env file");
       return;
     }
-    // Consider adding WebGL check if needed based on options
+
     const loader = new Loader({
       apiKey: apiKey,
       version: "weekly",
-      libraries: ["maps", "geometry"], // ADDED geometry library
+      libraries: ["maps", "geometry"],
     });
     loader
       .importLibrary("maps")
@@ -117,7 +117,7 @@ function App() {
           const map = new google.Map(document.getElementById("map")!, {
             center: { lat: 35.68, lng: 139.76 },
             zoom: 15,
-            disableDefaultUI: true, // Example: customize UI
+            disableDefaultUI: true,
             mapId: mapId,
           });
           setMapInstance(map);
@@ -129,7 +129,7 @@ function App() {
       });
   }, [apiKey, mapId, mapInstance]);
 
-  // --- Event Handlers for <RouteReplay> Component ---
+
   const handleFrame: PlayerEventMap["frame"] = useCallback(
     (payload) => {
       if (!isSeeking) {
@@ -167,7 +167,7 @@ function App() {
     setIsPlaying(false);
   }, []);
 
-  // --- Control Callbacks using the ref ---
+
   const handlePlay = useCallback(() => replayHandleRef.current?.play(), []);
   const handlePauseControl = useCallback(() => replayHandleRef.current?.pause(), []);
   const handleStop = useCallback(() => {
@@ -195,7 +195,7 @@ function App() {
     []
   );
 
-  // Callback for camera mode change
+
   const handleCameraModeChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const mode = event.target.value as CameraMode;
@@ -205,7 +205,7 @@ function App() {
     []
   );
 
-  // --- Seek Bar Handlers ---
+
   const handleSeekInput = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setIsSeeking(true);
@@ -226,24 +226,22 @@ function App() {
     [durationMs]
   );
 
-  // --- Conditional rendering based on error (this is fine) ---
+
   if (error) {
     return <div className="error">Error: {error}</div>;
   }
 
   const isReady = !!mapInstance && durationMs > 0;
 
-  // --- JSX return ---
+
   return (
     <>
       <h1>gm-route-replay React Example (Multi-Track)</h1>
-      {/* Map container */}
       <div
         id="map"
         style={{ height: "500px", width: "100%" }}
       ></div>
 
-      {/* RouteReplay Component */}
       {mapInstance && (
         <RouteReplay
           ref={replayHandleRef}
@@ -254,7 +252,7 @@ function App() {
           polylineOptions={polylineOptionsConfig}
           initialSpeed={1}
           cameraMode={"center"}
-          // Event Handlers
+
           onFrame={handleFrame}
           onStart={handleStart}
           onPause={handlePause}
@@ -264,12 +262,10 @@ function App() {
         />
       )}
 
-      {/* Controls (Simplified - adapt as needed) */}
       <div className="controls">
         <button onClick={handlePlay} disabled={isPlaying || !isReady}>Play</button>
         <button onClick={handlePauseControl} disabled={!isPlaying || !isReady}>Pause</button>
         <button onClick={handleStop} disabled={!isReady}>Stop</button>
-        {/* Add more controls like speed, seek bar, camera mode here */}
       </div>
     </>
   );
