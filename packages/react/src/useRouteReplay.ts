@@ -10,9 +10,7 @@ import {
   PlayerEventMap,
   RoutePoint,
   Plugin,
-  // @ts-ignore Ignore potential export error due to build cache
   CameraMode,
-  // @ts-ignore Ignore potential export error due to build cache
   CameraOptions,
 } from "@gm/route-replay-core";
 

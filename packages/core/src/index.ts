@@ -9,6 +9,8 @@ import {
   RouteInput,
   CameraMode,
   CameraOptions,
+  RendererType,
+  Plugin,
 } from "./types";
 import { Animator } from "./animator";
 import { MarkerRenderer } from "./renderers/marker";

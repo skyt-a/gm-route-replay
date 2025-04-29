@@ -1,7 +1,6 @@
 {
   "name": "@gm/route-replay-core",
   "version": "0.1.0",
-  "private": true,
   "description": "Core playback logic for gm-route-replay",
   "keywords": [
     "google-maps",
@@ -9,10 +8,21 @@
     "route",
     "replay",
     "playback",
-    "animation"
+    "animation",
+    "webgl",
+    "visualization"
   ],
-  "author": "Your Name <your.email@example.com>",
-  "license": "MIT",
+  "author": "skyt-a",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skyt-a/gm-route-replay.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/skyt-a/gm-route-replay/issues"
+  },
+  "homepage": "https://skyt-a.github.io/gm-route-replay/ja/",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

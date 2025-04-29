@@ -23,6 +23,7 @@ export default defineConfig({
             text: "サンプル",
             items: [
               { text: "React Hook サンプル", link: "/ja/examples/basic" },
+              { text: "コアライブラリ使用例", link: "/ja/examples/core-basic" },
             ],
           },
           {
@@ -78,7 +79,10 @@ export default defineConfig({
         sidebar: [
           {
             text: "Examples",
-            items: [{ text: "React Hook Example", link: "/en/examples/basic" }],
+            items: [
+              { text: "React Hook Example", link: "/en/examples/basic" },
+              { text: "Core Library Example", link: "/en/examples/core-basic" },
+            ],
           },
           {
             text: "API Reference",

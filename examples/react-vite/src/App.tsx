@@ -92,7 +92,7 @@ function App() {
       markerOptions: markerOptionsConfig,
       polylineOptions: polylineOptionsConfig,
       initialSpeed: 1,
-      cameraMode: "center",
+      cameraMode: "center" as CameraMode,
       cameraOptions: { zoomLevel: 16 },
       rendererType: "webgl",
       mapId: mapId,

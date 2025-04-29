@@ -1,39 +1,39 @@
+[English](./README.md) | **日本語**
+
 # GM Route Replay
 
 [![Deploy VitePress Docs to GitHub Pages](https://github.com/skyt-a/gm-route-replay/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/skyt-a/gm-route-replay/actions/workflows/deploy-docs.yml)
 
-A library for replaying route data with time information on Google Maps.
-It supports high-performance rendering using `WebGLOverlayView` and simultaneous playback of multiple tracks (moving entities).
+Google Maps 上で時間情報付きのルートデータを再生するためのライブラリです。
+WebGLOverlayView を利用した高パフォーマンスなレンダリングと、複数のトラック（移動体）の同時再生をサポートします。
 
-## Documentation
+## ドキュメント
 
-For detailed API references and usage examples, please refer to the documentation site:
+詳細な API リファレンスと使用例については、以下のドキュメントサイトを参照してください。
 
-**[GM Route Replay Documentation (English)](https://skyt-a.github.io/gm-route-replay/en/)**
+**[GM Route Replay Documentation](https://skyt-a.github.io/gm-route-replay/ja/)**
 
-(日本語版は [こちら](./README.ja.md))
+## 特徴
 
-## Features
+*   **選べるレンダラー:** 
+    *   デフォルト: 標準の `google.maps.Marker` を使用し、シンプルに利用可能。
+    *   オプション: 大量のマーカー描画に `google.maps.WebGLOverlayView` を使用し、高パフォーマンスを実現。
+*   **Multi-track:** 複数のルートデータを同時に再生
+*   **柔軟なカメラ制御:** 固定、追従、進行方向前方など、複数のカメラモード
+*   **シンプルな API:** コアライブラリと React Hook を提供
+*   **TypeScript:** 型定義による安全な開発
 
-*   **Selectable Renderers:**
-    *   Default: Uses standard `google.maps.Marker` for simple usage.
-    *   Optional: Uses `google.maps.WebGLOverlayView` for high-performance rendering of large numbers of markers.
-*   **Multi-track:** Play back multiple route data simultaneously.
-*   **Flexible Camera Control:** Multiple camera modes, including fixed, follow, and look-ahead.
-*   **Simple API:** Provides a core library and a React Hook.
-*   **TypeScript:** Safe development with type definitions.
-
-## Installation
+## インストール
 
 ```bash
-# Core Library
+# コアライブラリ
 pnpm add @gm/route-replay-core
 
-# React Hook (if using React)
+# React Hook (React を使用する場合)
 pnpm add @gm/route-replay-react
 ```
 
-## Basic Usage (React Hook)
+## 基本的な使い方 (React Hook)
 
 ```tsx
 import React, { useRef, useState, useEffect } from 'react';
@@ -63,7 +63,7 @@ function MapComponent() {
     mapContainerRef,
     isMapApiLoaded,
     route: routeData,
-    rendererType: 'webgl', // Using WebGL renderer
+    rendererType: 'webgl',
     mapId: mapId,
   });
 
@@ -82,9 +82,9 @@ function MapComponent() {
 }
 ```
 
-## Basic Usage (Core Library)
+## 基本的な使い方 (コアライブラリ)
 
-If you are not using React, you can use the core library directly.
+React を使用しない場合は、コアライブラリを直接利用できます。
 
 ```html
 <!DOCTYPE html>
@@ -147,33 +147,33 @@ function initMap() {
 window.initMap = initMap;
 ```
 
-## Development
+## 開発
 
-1.  **Clone the repository:**
+1.  **リポジトリをクローン:**
     ```bash
     git clone https://github.com/skyt-a/gm-route-replay.git
     cd gm-route-replay
     ```
-2.  **Install dependencies:**
+2.  **依存関係をインストール:**
     ```bash
     pnpm install
     ```
-3.  **Start development servers:**
+3.  **開発サーバーを起動:**
     ```bash
-    # Build/watch all packages
+    # パッケージ全体のビルド/ウォッチ
     pnpm dev
 
-    # Documentation site dev server
+    # ドキュメントサイトの開発サーバー
     pnpm docs:dev
 
-    # React sample dev server (examples/react-vite)
+    # React サンプルの開発サーバー (examples/react-vite)
     cd examples/react-vite
-    # Set API key in .env file
+    # .env ファイルに API キーを設定
     cp .env.example .env
-    # Start server
+    # サーバー起動
     pnpm dev
     ```
 
-## License
+## ライセンス
 
-[ISC](./LICENSE)
+[ISC](./LICENSE) (package.json に基づく - 必要であれば LICENSE ファイルを作成してください) 
