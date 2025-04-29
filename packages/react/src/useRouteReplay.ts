@@ -12,7 +12,7 @@ import {
   Plugin,
   CameraMode,
   CameraOptions,
-} from "@gm/route-replay-core";
+} from "gm-route-replay-core";
 
 // Re-define RouteInput locally to avoid export issues
 type LocalRouteInput =

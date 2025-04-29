@@ -50,15 +50,15 @@ importers:
 
   examples/react-vite:
     dependencies:
-      '@gm/route-replay-core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@gm/route-replay-react':
-        specifier: workspace:*
-        version: link:../../packages/react
       '@googlemaps/js-api-loader':
         specifier: ^1.16.6
         version: 1.16.8
+      gm-route-replay-core:
+        specifier: workspace:*
+        version: link:../../packages/core
+      gm-route-replay-react:
+        specifier: workspace:*
+        version: link:../../packages/react
       react:
         specifier: ^19.0.0
         version: 19.1.0
@@ -143,10 +143,6 @@ importers:
         version: 5.8.3
 
   packages/react:
-    dependencies:
-      '@gm/route-replay-core':
-        specifier: workspace:*
-        version: link:../core
     devDependencies:
       '@types/google.maps':
         specifier: ^3.58.1
@@ -154,6 +150,9 @@ importers:
       '@types/react':
         specifier: ^19.1.2
         version: 19.1.2
+      gm-route-replay-core:
+        specifier: workspace:*
+        version: link:../core
       react:
         specifier: ^19.1.0
         version: 19.1.0

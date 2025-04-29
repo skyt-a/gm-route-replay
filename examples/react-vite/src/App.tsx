@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
-import { useRouteReplay } from "@gm/route-replay-react"; // Assuming workspace link works
-import type { RoutePoint, RouteInput, CameraMode } from "@gm/route-replay-core";
+import { useRouteReplay } from "gm-route-replay-react"; // スコープを削除
+import type { RoutePoint, RouteInput, CameraMode } from "gm-route-replay-core"; // スコープを削除
 import "./App.css";
 
 // --- Sample Data & Config (Outside Component) ---
