@@ -29,11 +29,14 @@ For detailed API references and usage examples, please refer to the documentatio
 
 ```bash
 # Core Library
+npm install gm-route-replay-core
+yarn add gm-route-replay-core
 pnpm add gm-route-replay-core
 
-# React Hook (if using React)
-pnpm add gm-route-replay-react
-```
+# if using React
+npm install gm-route-replay-react
+yarn add gm-route-replay-react
+pnpm add gm-route-replay-react```
 
 ## Basic Usage (React Component)
 
