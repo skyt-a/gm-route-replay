@@ -29,9 +29,13 @@ https://github.com/user-attachments/assets/c024a0e5-4d4a-43f5-88bc-e8c5e16e4110
 
 ```bash
 # コアライブラリ
+npm install gm-route-replay-core
+yarn add gm-route-replay-core
 pnpm add gm-route-replay-core
 
 # React Hook (React を使用する場合)
+npm install gm-route-replay-react
+yarn add gm-route-replay-react
 pnpm add gm-route-replay-react
 ```
 
