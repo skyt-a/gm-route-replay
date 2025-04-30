@@ -354,7 +354,7 @@ export class WebGLOverlayRenderer implements IRenderer {
     );
     gl.enableVertexAttribArray(this.pointPositionAttributeLocation);
 
-    this.markersData.forEach((data, trackId) => {
+    this.markersData.forEach((data) => {
       if (data.path.length === 0) return;
 
       const lastPosition = data.path[data.path.length - 1];
