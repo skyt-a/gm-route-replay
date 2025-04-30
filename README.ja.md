@@ -7,6 +7,8 @@
 Google Maps 上で時間情報付きのルートデータを再生するためのライブラリです。
 WebGLOverlayView を利用した高パフォーマンスなレンダリングと、複数のトラック（移動体）の同時再生をサポートします。
 
+https://github.com/user-attachments/assets/c024a0e5-4d4a-43f5-88bc-e8c5e16e4110
+
 ## ドキュメント
 
 詳細な API リファレンスと使用例については、以下のドキュメントサイトを参照してください。
