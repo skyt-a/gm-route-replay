@@ -9,7 +9,7 @@ WebGLOverlayView を利用した高パフォーマンスなレンダリングと
 
 https://github.com/user-attachments/assets/c024a0e5-4d4a-43f5-88bc-e8c5e16e4110
 
-デモ: https://route-replay-googlemaps-react-vite.vercel.app/
+デモ: https://gm-route-replay-react-vite.vercel.app
 
 ## ドキュメント
 
