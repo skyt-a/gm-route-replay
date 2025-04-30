@@ -32,7 +32,6 @@ export class Animator {
     }
     if (this.speedMultiplier !== multiplier) {
       this.speedMultiplier = multiplier;
-      console.log(`Animator speed set to ${multiplier}x`);
       if (this.isRunning) {
         this.lastFrameTime = performance.now();
       }

@@ -79,7 +79,6 @@ export class MarkerRenderer implements IRenderer {
         map: this.map,
       });
       this.markers.set(trackId, marker);
-      console.log(`Marker created for track ${trackId}`);
     } else {
       const currentPos = marker.getPosition();
       if (
@@ -128,7 +127,6 @@ export class MarkerRenderer implements IRenderer {
       marker.setMap(null);
       this.markers.delete(trackId);
       this.lastHeadings.delete(trackId);
-      console.log(`Marker removed for track ${trackId}`);
     }
   }
 
@@ -141,7 +139,6 @@ export class MarkerRenderer implements IRenderer {
     });
     this.markers.clear();
     this.lastHeadings.clear();
-    console.log("All markers removed.");
   }
 
   /**
@@ -149,6 +146,5 @@ export class MarkerRenderer implements IRenderer {
    */
   destroy(): void {
     this.removeAllMarkers();
-    console.log("MarkerRenderer destroyed.");
   }
 }

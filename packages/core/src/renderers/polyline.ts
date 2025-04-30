@@ -20,7 +20,6 @@ export class PolylineRenderer {
       path: [],
       map: this.map,
     };
-    console.log("PolylineRenderer initialized for multi-track.");
   }
 
   private getOrCreatePolyline(trackId: string): google.maps.Polyline {
@@ -31,7 +30,6 @@ export class PolylineRenderer {
       });
       this.polylines.set(trackId, polyline);
       this.currentPaths.set(trackId, []);
-      console.log(`Polyline created for track ${trackId}`);
     }
     return polyline;
   }
@@ -86,7 +84,6 @@ export class PolylineRenderer {
   resetAllPaths(): void {
     this.polylines.forEach((polyline) => polyline.setPath([]));
     this.currentPaths.clear();
-    console.log("All polyline paths reset.");
   }
 
   /**
@@ -110,7 +107,6 @@ export class PolylineRenderer {
       polyline.setMap(null);
       this.polylines.delete(trackId);
       this.currentPaths.delete(trackId);
-      console.log(`Polyline removed for track ${trackId}`);
     }
   }
 
@@ -123,7 +119,6 @@ export class PolylineRenderer {
     });
     this.polylines.clear();
     this.currentPaths.clear();
-    console.log("All polylines removed.");
   }
 
   /**
@@ -131,6 +126,5 @@ export class PolylineRenderer {
    */
   destroy(): void {
     this.removeAllPaths();
-    console.log("PolylineRenderer destroyed.");
   }
 }

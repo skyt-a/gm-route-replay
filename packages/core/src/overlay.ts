@@ -47,7 +47,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
 
   constructor(options: PlayerOptions) {
     super();
-    console.log("GmRouteReplayOverlay: Constructor called", options);
 
     if (!options.map) {
       throw new Error(
@@ -72,7 +71,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
    * Initialize components here.
    */
   onAdd(): void {
-    console.log("GmRouteReplayOverlay: onAdd called");
     const map = this.getMap();
     if (!map) {
       console.error("GmRouteReplayOverlay: Map not available in onAdd");
@@ -86,12 +84,10 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
 
     const rendererType = this.options.rendererType ?? "marker";
     if (rendererType === "webgl") {
-      console.log("GmRouteReplayOverlay: Initializing WebGLOverlayRenderer");
       this.markerRenderer = new WebGLOverlayRenderer({
         map: map as google.maps.Map,
       });
     } else {
-      console.log("GmRouteReplayOverlay: Initializing MarkerRenderer");
       this.markerRenderer = new MarkerRenderer({
         map: map as google.maps.Map,
         markerOptions: this.options.markerOptions,
@@ -100,7 +96,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
     this.markerRenderer.mount();
 
     if (this.options.polylineOptions) {
-      console.log("GmRouteReplayOverlay: Initializing PolylineRenderer");
       this.polylineRenderer = new PolylineRenderer({
         map: map as google.maps.Map,
         polylineOptions: this.options.polylineOptions,
@@ -114,7 +109,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
     }
 
     this.isInitialized = true;
-    console.log("GmRouteReplayOverlay: onAdd finished, initialized.");
   }
 
   /**
@@ -122,7 +116,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
    * Clean up resources here.
    */
   onRemove(): void {
-    console.log("GmRouteReplayOverlay: onRemove called");
     this.isInitialized = false;
 
     this.animator?.destroy();
@@ -135,8 +128,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
 
     this.processedRoutes.clear();
     this.trackIds = [];
-
-    console.log("GmRouteReplayOverlay: onRemove finished, cleaned up.");
   }
 
   /**
@@ -150,14 +141,11 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
     }
 
     if (this.needsRedraw) {
-      console.log("GmRouteReplayOverlay: draw triggered by needsRedraw flag");
-
       this.needsRedraw = false;
     }
   }
 
   private processRouteData(input: RouteInput): void {
-    console.log("GmRouteReplayOverlay: Processing route data...");
     if (!this.markerRenderer) {
       console.warn(
         "GmRouteReplayOverlay: Renderers not ready for route processing."
@@ -265,14 +253,7 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
       0,
       this.globalEndTimeMs - this.globalStartTimeMs
     );
-
-    console.log(
-      `GmRouteReplayOverlay: Route processed. ${this.trackIds.length} track(s).`,
-      `Start: ${this.globalStartTimeMs}, End: ${this.globalEndTimeMs}, Duration: ${this.globalDurationMs}ms`
-    );
-
     this.updateRenderersAtTime(0);
-
     if (this.options.autoFit !== false) {
       const bounds = new google.maps.LatLngBounds();
       this.processedRoutes.forEach((route) => {
@@ -280,7 +261,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
       });
       if (!bounds.isEmpty()) {
         (this.getMap() as google.maps.Map)?.fitBounds(bounds);
-        console.log("GmRouteReplayOverlay: Map bounds fitted.");
       }
     }
     this.needsRedraw = true;
@@ -432,7 +412,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
   }
 
   private handleFinish(): void {
-    console.log("GmRouteReplayOverlay: Playback finished.");
     this.animator?.pause();
 
     this.updateRenderersAtTime(this.globalEndTimeMs);
@@ -443,12 +422,10 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
     event: E,
     payload?: Parameters<PlayerEventMap[E]>[0]
   ): void {
-    console.log(`GmRouteReplayOverlay: Triggering event: ${event}`, payload);
     google.maps.event.trigger(this, event, payload);
   }
 
   public play(): void {
-    console.log("GmRouteReplayOverlay: play()");
     if (!this.isInitialized || !this.animator) return;
 
     if (this.currentTimelineTimeMs >= this.globalDurationMs) {
@@ -459,14 +436,12 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
   }
 
   public pause(): void {
-    console.log("GmRouteReplayOverlay: pause()");
     if (!this.isInitialized || !this.animator) return;
     this.animator.pause();
     this.triggerEvent("pause", undefined);
   }
 
   public stop(): void {
-    console.log("GmRouteReplayOverlay: stop()");
     if (!this.isInitialized || !this.animator) return;
     this.animator.stop();
     this.currentTimelineTimeMs = 0;
@@ -556,10 +531,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
         );
       }
 
-      console.log(
-        `Setting path for track ${trackId} at relative time ${clampedTime} (abs: ${absoluteTargetTime}):`,
-        JSON.stringify(pathPoints)
-      );
       this.polylineRenderer?.setPath(trackId, pathPoints);
     });
 
@@ -570,13 +541,11 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
   }
 
   public setSpeed(multiplier: number): void {
-    console.log(`GmRouteReplayOverlay: setSpeed(${multiplier})`);
     if (!this.isInitialized || !this.animator) return;
     this.animator.setSpeed(multiplier);
   }
 
   public setCameraMode(mode: CameraMode, options?: CameraOptions): void {
-    console.log(`GmRouteReplayOverlay: setCameraMode(${mode})`, options);
     if (!this.isInitialized) return;
     this.currentCameraMode = mode;
     if (options) {
@@ -587,14 +556,12 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
           options.defaultTilt ?? this.currentCameraOptions.defaultTilt,
         zoomLevel: options.zoomLevel ?? this.currentCameraOptions.zoomLevel,
       };
-      console.log("Updated camera options:", this.currentCameraOptions);
     }
 
     this.updateCamera(this.currentTimelineTimeMs);
   }
 
   public setRoute(route: RouteInput): void {
-    console.log("GmRouteReplayOverlay: setRoute called", route);
     if (!this.isInitialized) {
       this.options.route = route;
       return;
@@ -606,8 +573,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
   }
 
   public setOptions(options: Partial<PlayerOptions>): void {
-    console.log("GmRouteReplayOverlay: setOptions called", options);
-
     if (options.fps !== undefined) this.options.fps = options.fps;
     if (options.initialSpeed !== undefined)
       this.options.initialSpeed = options.initialSpeed;
@@ -619,7 +584,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
     ) {
       this.options.rendererType = options.rendererType;
       needsRendererReinit = true;
-      console.log("Renderer type changed, needs re-initialization.");
     }
     if (options.markerOptions !== undefined) {
       this.options.markerOptions = options.markerOptions;
@@ -639,7 +603,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
     }
 
     if (needsRendererReinit && this.isInitialized && this.getMap()) {
-      console.log("Re-initializing renderer...");
       const map = this.getMap() as google.maps.Map;
       this.markerRenderer?.destroy();
       const rendererType = this.options.rendererType ?? "marker";
@@ -672,8 +635,6 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
         this.animator.start(this.handleFrame.bind(this));
       }
     }
-
-    console.log("GmRouteReplayOverlay: Options updated.");
   }
 
   public destroy(): void {

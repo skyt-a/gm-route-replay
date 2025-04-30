@@ -112,19 +112,16 @@ function setupEventListeners() {
   if (!routeReplayOverlay) return;
 
   google.maps.event.addListener(routeReplayOverlay, "start", () => {
-    console.log("Event: start");
     isPlaying = true;
     updateUI();
   });
 
   google.maps.event.addListener(routeReplayOverlay, "pause", () => {
-    console.log("Event: pause");
     isPlaying = false;
     updateUI();
   });
 
   google.maps.event.addListener(routeReplayOverlay, "finish", () => {
-    console.log("Event: finish");
     isPlaying = false;
     currentProgress = 1;
     updateUI();
