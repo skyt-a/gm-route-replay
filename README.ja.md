@@ -160,33 +160,6 @@ function initMap() {
 window.initMap = initMap;
 ```
 
-## 開発
-
-1.  **リポジトリをクローン:**
-    ```bash
-    git clone https://github.com/skyt-a/gm-route-replay.git
-    cd gm-route-replay
-    ```
-2.  **依存関係をインストール:**
-    ```bash
-    pnpm install
-    ```
-3.  **開発サーバーを起動:**
-    ```bash
-    # パッケージ全体のビルド/ウォッチ
-    pnpm dev
-
-    # ドキュメントサイトの開発サーバー
-    pnpm docs:dev
-
-    # React サンプルの開発サーバー (examples/react-vite)
-    cd examples/react-vite
-    # .env ファイルに API キーを設定
-    cp .env.example .env
-    # サーバー起動
-    pnpm dev
-    ```
-
 ## ライセンス
 
 [ISC](./LICENSE)
