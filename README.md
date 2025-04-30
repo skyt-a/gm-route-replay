@@ -36,7 +36,8 @@ pnpm add gm-route-replay-core
 # if using React
 npm install gm-route-replay-react
 yarn add gm-route-replay-react
-pnpm add gm-route-replay-react```
+pnpm add gm-route-replay-react
+```
 
 ## Basic Usage (React Component)
 
