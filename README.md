@@ -4,6 +4,7 @@
 
 A library for replaying route data with time information on Google Maps.
 It supports high-performance rendering using `WebGLOverlayView` and simultaneous playback of multiple tracks (moving entities).
+
 https://github.com/user-attachments/assets/c024a0e5-4d4a-43f5-88bc-e8c5e16e4110
 
 ## Documentation
