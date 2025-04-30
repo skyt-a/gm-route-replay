@@ -78,6 +78,10 @@ export class Animator {
     this.stop();
   }
 
+  public isPaused(): boolean {
+    return !this.isRunning;
+  }
+
   private loop = (currentTime: number): void => {
     if (!this.isRunning) return;
 

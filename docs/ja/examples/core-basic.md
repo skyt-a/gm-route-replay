@@ -10,7 +10,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>GM Route Replay Core Example</title>
+    <title>Google Map Route Replay Core Example</title>
     <style>
         #map { height: 400px; width: 100%; }
         button { margin: 5px; }

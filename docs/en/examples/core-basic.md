@@ -10,14 +10,14 @@ You'll need a basic HTML file to host the map and controls:
 <!DOCTYPE html>
 <html>
 <head>
-    <title>GM Route Replay Core Example</title>
+    <title>Google Map Route Replay Core Example</title>
     <style>
         #map { height: 400px; width: 100%; }
         button { margin: 5px; }
     </style>
 </head>
 <body>
-    <h1>GM Route Replay Core Example</h1>
+    <h1>Google Map Route Replay Core Example</h1>
     <div id="map"></div>
     <div>
         <button id="playBtn">Play</button>

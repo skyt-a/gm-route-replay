@@ -1,6 +1,6 @@
 [English](./README.md) | **日本語**
 
-# GM Route Replay
+# Google Map Route Replay
 
 [![Deploy VitePress Docs to GitHub Pages](https://github.com/skyt-a/gm-route-replay/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/skyt-a/gm-route-replay/actions/workflows/deploy-docs.yml)
 
@@ -15,7 +15,7 @@ https://github.com/user-attachments/assets/c024a0e5-4d4a-43f5-88bc-e8c5e16e4110
 
 詳細な API リファレンスと使用例については、以下のドキュメントサイトを参照してください。
 
-**[GM Route Replay Documentation](https://skyt-a.github.io/gm-route-replay/ja/)**
+**[Google Map Route Replay Documentation](https://skyt-a.github.io/gm-route-replay/ja/)**
 
 ## 特徴
 
@@ -104,13 +104,13 @@ React を使用しない場合は、コアライブラリを直接利用でき�
 <!DOCTYPE html>
 <html>
 <head>
-    <title>GM Route Replay Core Example</title>
+    <title>Google Map Route Replay Core Example</title>
     <style>
         #map { height: 400px; width: 100%; }
     </style>
 </head>
 <body>
-    <h1>GM Route Replay Core Example</h1>
+    <h1>Google Map Route Replay Core Example</h1>
     <div id="map"></div>
     <button id="playBtn">Play</button>
     <button id="pauseBtn">Pause</button>

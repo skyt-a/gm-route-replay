@@ -1,6 +1,6 @@
 **English** | [日本語](./README.ja.md)
 
-# GM Route Replay
+# Google Map Route Replay
 
 [![Deploy VitePress Docs to GitHub Pages](https://github.com/skyt-a/gm-route-replay/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/skyt-a/gm-route-replay/actions/workflows/deploy-docs.yml)
 
@@ -15,7 +15,7 @@ demo: https://gm-route-replay-react-vite.vercel.app/
 
 For detailed API references and usage examples, please refer to the documentation site:
 
-**[GM Route Replay Documentation (English)](https://skyt-a.github.io/gm-route-replay/en/)**
+**[Google Map Route Replay Documentation (English)](https://skyt-a.github.io/gm-route-replay/en/)**
 
 ## Features
 
@@ -104,13 +104,13 @@ If you are not using React, you can use the core library directly.
 <!DOCTYPE html>
 <html>
 <head>
-    <title>GM Route Replay Core Example</title>
+    <title>Google Map Route Replay Core Example</title>
     <style>
         #map { height: 400px; width: 100%; }
     </style>
 </head>
 <body>
-    <h1>GM Route Replay Core Example</h1>
+    <h1>Google Map Route Replay Core Example</h1>
     <div id="map"></div>
     <button id="playBtn">Play</button>
     <button id="pauseBtn">Pause</button>

@@ -43,6 +43,8 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
 
   private needsRedraw = false;
 
+  private isPausedBeforeSeek = false;
+
   constructor(options: PlayerOptions) {
     super();
     console.log("GmRouteReplayOverlay: Constructor called", options);
@@ -477,18 +479,18 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
   }
 
   public seek(timeMs: number): void {
-    console.log(
-      `GmRouteReplayOverlay: seek(${timeMs}) - Logic Rebuild V4 (Absolute Time)`
-    );
     if (!this.isInitialized || !this.animator || !this.polylineRenderer) return;
-
+    if (this.animator.isPaused()) {
+      this.isPausedBeforeSeek = true;
+    } else {
+      this.isPausedBeforeSeek = false;
+      this.pause();
+    }
     const clampedTime = Math.max(0, Math.min(timeMs, this.globalDurationMs));
     this.animator.setCurrentTimelineTimeMs(clampedTime);
     this.currentTimelineTimeMs = clampedTime;
 
     const absoluteTargetTimeForRender = this.globalStartTimeMs + clampedTime;
-
-    console.log(`seek calculated absoluteTime: ${absoluteTargetTimeForRender}`);
 
     this.updateRenderersAtTime(absoluteTargetTimeForRender);
     this.updateCamera(absoluteTargetTimeForRender);
@@ -562,6 +564,9 @@ export class GmRouteReplayOverlay extends google.maps.OverlayView {
     });
 
     this.triggerEvent("seek", { timeMs: clampedTime });
+    if (!this.isPausedBeforeSeek) {
+      this.play();
+    }
   }
 
   public setSpeed(multiplier: number): void {

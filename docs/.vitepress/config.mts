@@ -1,7 +1,7 @@
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  title: "GM Route Replay",
+  title: "Google Map Route Replay",
   base: "/gm-route-replay/",
 
   locales: {
