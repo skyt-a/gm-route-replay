@@ -118,9 +118,7 @@ export class WebGLOverlayRenderer implements IRenderer {
     }
   }
 
-  private onAdd(): void {
-    console.log("WebGLOverlayView: onAdd");
-  }
+  private onAdd(): void {}
 
   private onContextRestored({ gl }: google.maps.WebGLStateOptions): void {
     this.gl = gl;
