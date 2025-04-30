@@ -37,7 +37,7 @@
 ## 例
 
 ```typescript
-import { GmRouteReplayOverlay } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay } from 'route-replay-googlemaps-core';
 
 const options: GmRouteReplayOverlayOptions = {
   map: mapInstance,

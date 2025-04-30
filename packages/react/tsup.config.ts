@@ -9,7 +9,7 @@ export default defineConfig((options) => ({
   sourcemap: true,
   clean: true,
   tsconfig: "./tsconfig.json",
-  external: ["react", "gm-route-replay-core"],
+  external: ["react", "route-replay-googlemaps-core"],
   minify: !options.watch,
   treeshake: true,
   metafile: true,

@@ -1,6 +1,6 @@
 # コアライブラリ使用例
 
-このページは、React を使わずに、コアライブラリ `gm-route-replay-core` を直接使用する基本的な例を示します。
+このページは、React を使わずに、コアライブラリ `route-replay-googlemaps-core` を直接使用する基本的な例を示します。
 
 ## HTML の準備
 
@@ -10,7 +10,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Google Map Route Replay Core Example</title>
+    <title>GoogleMaps Route Replay Core Example</title>
     <style>
         #map { height: 400px; width: 100%; }
         button { margin: 5px; }
@@ -41,7 +41,7 @@
 マップとプレイヤーを初期化するための JavaScript ファイル（例: `core-example.js`）を作成します。
 
 ```javascript
-import { createPlayer } from 'gm-route-replay-core';
+import { createPlayer } from 'route-replay-googlemaps-core';
 
 let map;
 let player;

@@ -5,7 +5,7 @@ The main class providing the route replay functionality. It inherits from Google
 ## Constructor
 
 ```typescript
-import { GmRouteReplayOverlay, GmRouteReplayOverlayOptions } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay, GmRouteReplayOverlayOptions } from 'route-replay-googlemaps-core';
 
 new GmRouteReplayOverlay(options: GmRouteReplayOverlayOptions);
 ```
@@ -22,7 +22,7 @@ After creating an instance of `GmRouteReplayOverlay`, add it to the Google Maps 
 **Important:** Following the `OverlayView` lifecycle, the player is initialized after the `onAdd` method is called, and its various methods become available.
 
 ```typescript
-import { GmRouteReplayOverlay } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay } from 'route-replay-googlemaps-core';
 
 const map = new google.maps.Map(document.getElementById('map'), { /* ... map options ... */ });
 

@@ -1,7 +1,7 @@
 {
-  "name": "gm-route-replay-react",
+  "name": "route-replay-googlemaps-react",
   "version": "1.0.0",
-  "description": "React hook and components for gm-route-replay",
+  "description": "React hook and components for route-replay-googlemaps",
   "keywords": [
     "google-maps",
     "route",
@@ -13,13 +13,13 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/skyt-a/gm-route-replay.git",
+    "url": "git+https://github.com/skyt-a/route-replay-googlemaps.git",
     "directory": "packages/react"
   },
   "bugs": {
-    "url": "https://github.com/skyt-a/gm-route-replay/issues"
+    "url": "https://github.com/skyt-a/route-replay-googlemaps/issues"
   },
-  "homepage": "https://skyt-a.github.io/gm-route-replay/ja/",
+  "homepage": "https://skyt-a.github.io/route-replay-googlemaps/ja/",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -43,7 +43,7 @@
     "dev": "tsup --watch"
   },
   "peerDependencies": {
-    "gm-route-replay-core": "^0.1.1",
+    "route-replay-googlemaps-core": "^0.1.1",
     "react": "^18.0.0 || ^19.0.0"
   },
   "devDependencies": {
@@ -52,7 +52,7 @@
     "@types/google.maps": "^3.58.1",
     "@types/react": "^19.1.2",
     "@types/testing-library__jest-dom": "^6.0.0",
-    "gm-route-replay-core": "workspace:*",
+    "route-replay-googlemaps-core": "workspace:*",
     "jsdom": "^26.1.0",
     "react": "^19.1.0",
     "tsup": "^8.4.0",

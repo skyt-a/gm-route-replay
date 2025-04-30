@@ -5,7 +5,7 @@
 ## コンストラクタ
 
 ```typescript
-import { GmRouteReplayOverlay, GmRouteReplayOverlayOptions } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay, GmRouteReplayOverlayOptions } from 'route-replay-googlemaps-core';
 
 new GmRouteReplayOverlay(options: GmRouteReplayOverlayOptions);
 ```
@@ -22,7 +22,7 @@ new GmRouteReplayOverlay(options: GmRouteReplayOverlayOptions);
 **重要:** `OverlayView` のライフサイクルに従い、`onAdd` メソッドが呼ばれた後にプレイヤーが初期化され、各種メソッドが利用可能になります。
 
 ```typescript
-import { GmRouteReplayOverlay } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay } from 'route-replay-googlemaps-core';
 
 const map = new google.maps.Map(document.getElementById('map'), { /* ... map options ... */ });
 

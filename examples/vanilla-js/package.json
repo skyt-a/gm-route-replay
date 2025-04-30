@@ -11,7 +11,7 @@
   "devDependencies": {
     "@googlemaps/js-api-loader": "^1.16.8",
     "@types/google.maps": "^3.58.1",
-    "gm-route-replay-core": "workspace:^",
+    "route-replay-googlemaps-core": "workspace:^",
     "typescript": "~5.7.2",
     "vite": "^6.3.1"
   }

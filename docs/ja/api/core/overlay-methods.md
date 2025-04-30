@@ -98,7 +98,7 @@ window.addEventListener('beforeunload', () => {
 ## 例
 
 ```typescript
-import { GmRouteReplayOverlay } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay } from 'route-replay-googlemaps-core';
 
 
 const overlay = new GmRouteReplayOverlay(options);

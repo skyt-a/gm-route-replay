@@ -1,8 +1,8 @@
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  title: "Google Map Route Replay",
-  base: "/gm-route-replay/",
+  title: "GoogleMaps Route Replay",
+  base: "/route-replay-googlemaps/",
 
   locales: {
     ja: {
@@ -27,12 +27,12 @@ export default defineConfig({
             text: "API リファレンス",
             items: [
               {
-                text: "コアライブラリ (gm-route-replay-core)",
+                text: "コアライブラリ (route-replay-googlemaps-core)",
                 collapsed: false,
                 items: [
                   {
                     text: "GmRouteReplayOverlay",
-                    link: "/ja/api/core/gm-route-replay-overlay",
+                    link: "/ja/api/core/route-replay-googlemaps-overlay",
                   },
                   {
                     text: "OverlayOptions",
@@ -49,7 +49,7 @@ export default defineConfig({
                 ],
               },
               {
-                text: "React Component (gm-route-replay-react)",
+                text: "React Component (route-replay-googlemaps-react)",
                 collapsed: false,
                 items: [
                   {
@@ -67,7 +67,7 @@ export default defineConfig({
         ],
         editLink: {
           pattern:
-            "https://github.com/your-repo/gm-route-replay/edit/main/docs/:path",
+            "https://github.com/your-repo/route-replay-googlemaps/edit/main/docs/:path",
           text: "このページを GitHub で編集",
         },
         socialLinks: [],
@@ -96,12 +96,12 @@ export default defineConfig({
             text: "API Reference",
             items: [
               {
-                text: "Core Library (gm-route-replay-core)",
+                text: "Core Library (route-replay-googlemaps-core)",
                 collapsed: false,
                 items: [
                   {
                     text: "GmRouteReplayOverlay",
-                    link: "/en/api/core/gm-route-replay-overlay",
+                    link: "/en/api/core/route-replay-googlemaps-overlay",
                   },
                   {
                     text: "OverlayOptions",
@@ -118,7 +118,7 @@ export default defineConfig({
                 ],
               },
               {
-                text: "React Component (gm-route-replay-react)",
+                text: "React Component (route-replay-googlemaps-react)",
                 collapsed: false,
                 items: [
                   {
@@ -136,7 +136,7 @@ export default defineConfig({
         ],
         editLink: {
           pattern:
-            "https://github.com/your-repo/gm-route-replay/edit/main/docs/:path",
+            "https://github.com/your-repo/route-replay-googlemaps/edit/main/docs/:path",
           text: "Edit this page on GitHub",
         },
         socialLinks: [],

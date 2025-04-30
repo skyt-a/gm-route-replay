@@ -43,7 +43,7 @@ Methods and properties available on an instance of the `GmRouteReplayOverlay` cl
 ## Example
 
 ```typescript
-import { GmRouteReplayOverlay } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay } from 'route-replay-googlemaps-core';
 
 
 const overlay = new GmRouteReplayOverlay(options);

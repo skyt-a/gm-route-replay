@@ -37,7 +37,7 @@ Interface defining the configuration options passed to the `GmRouteReplayOverlay
 ## Example
 
 ```typescript
-import { GmRouteReplayOverlay, GmRouteReplayOverlayOptions } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay, GmRouteReplayOverlayOptions } from 'route-replay-googlemaps-core';
 
 const options: GmRouteReplayOverlayOptions = {
   map: mapInstance,

@@ -1,7 +1,7 @@
 {
-  "name": "gm-route-replay-core",
+  "name": "route-replay-googlemaps-core",
   "version": "1.0.0",
-  "description": "Core playback logic for gm-route-replay",
+  "description": "Core playback logic for route-replay-googlemaps",
   "keywords": [
     "google-maps",
     "gps",
@@ -16,13 +16,13 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/skyt-a/gm-route-replay.git",
+    "url": "git+https://github.com/skyt-a/route-replay-googlemaps.git",
     "directory": "packages/core"
   },
   "bugs": {
-    "url": "https://github.com/skyt-a/gm-route-replay/issues"
+    "url": "https://github.com/skyt-a/route-replay-googlemaps/issues"
   },
-  "homepage": "https://skyt-a.github.io/gm-route-replay/ja/",
+  "homepage": "https://skyt-a.github.io/route-replay-googlemaps/ja/",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

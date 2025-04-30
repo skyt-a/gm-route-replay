@@ -8,4 +8,4 @@ export type {
   CameraOptions,
   PlayerEventMap,
   PlayerEvent,
-} from "gm-route-replay-core";
+} from "route-replay-googlemaps-core";

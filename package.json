@@ -1,5 +1,5 @@
 {
-  "name": "gm-route-replay",
+  "name": "route-replay-googlemaps",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,10 +7,10 @@
     "test": "vitest",
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "build:core": "pnpm --filter=gm-route-replay-core build",
-    "build:react": "pnpm --filter=gm-route-replay-react build",
-    "dev:core": "pnpm --filter=gm-route-replay-core dev",
-    "dev:react": "pnpm --filter=gm-route-replay-react dev",
+    "build:core": "pnpm --filter=route-replay-googlemaps-core build",
+    "build:react": "pnpm --filter=route-replay-googlemaps-react build",
+    "dev:core": "pnpm --filter=route-replay-googlemaps-core dev",
+    "dev:react": "pnpm --filter=route-replay-googlemaps-react dev",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"

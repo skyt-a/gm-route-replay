@@ -3,8 +3,8 @@
 ルートリプレイの表示と制御を行うための主要な React コンポーネントです。
 
 ```tsx
-import { RouteReplay, RouteReplayHandle } from 'gm-route-replay-react';
-import type { RouteInput, PlayerOptions, PlayerEventMap } from 'gm-route-replay-core';
+import { RouteReplay, RouteReplayHandle } from 'route-replay-googlemaps-react';
+import type { RouteInput, PlayerOptions, PlayerEventMap } from 'route-replay-googlemaps-core';
 import { useRef, useState, useEffect } from 'react';
 
 function MyComponent() {
@@ -51,7 +51,7 @@ function MyComponent() {
 - **型:** `google.maps.Map`
 - **必須:** `true`
 
-リプレイを表示する Google Map インスタンス。
+リプレイを表示する GoogleMaps インスタンス。
 
 ### `route`
 

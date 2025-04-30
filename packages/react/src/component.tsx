@@ -13,7 +13,7 @@ import {
   PlayerEvent,
   CameraMode,
   CameraOptions,
-} from "gm-route-replay-core";
+} from "route-replay-googlemaps-core";
 
 type ComponentSpecificOptions = Omit<CoreOptions, "map" | "route">;
 
@@ -77,7 +77,9 @@ export const RouteReplay = forwardRef<RouteReplayHandle, RouteReplayProps>(
 
       const initializeOverlay = async () => {
         try {
-          const { GmRouteReplayOverlay } = await import("gm-route-replay-core");
+          const { GmRouteReplayOverlay } = await import(
+            "route-replay-googlemaps-core"
+          );
 
           if (!isMounted) return;
 

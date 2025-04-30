@@ -3,19 +3,18 @@ name: Publish Packages to npm
 on:
   push:
     tags:
-      - "v*.*.*" # Trigger on version tags like v1.0.0
+      - "v*.*.*"
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # id-token: write # Uncomment if using OIDC for provenance
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch all history for git info
+          fetch-depth: 0
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
       - name: Setup Node
@@ -28,17 +27,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build packages
-        # Assumes the root build script builds both packages.
-        # If not, use: pnpm run build --filter gm-route-replay-core --filter gm-route-replay-react
         run: pnpm run build
-
-      # - name: Generate npm provenance # Optional: enhances security by linking build to package
-      #   uses: actions/attest-build-provenance@v1
-      #   with:
-      #     subject-path: 'packages/*/*.tgz' # Adjust if build outputs tgz files directly
-
       - name: Publish packages to npm
-        # If build step doesn't output to root node_modules, use --filter like in build step
-        run: pnpm publish --filter gm-route-replay-core --filter gm-route-replay-react --no-git-checks --access public
+        run: pnpm publish --filter route-replay-googlemaps-core --filter route-replay-googlemaps-react --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

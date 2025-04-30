@@ -16,7 +16,7 @@ import type {
   PlayerOptions,
   CameraMode,
   CameraOptions,
-} from "gm-route-replay-core";
+} from "route-replay-googlemaps-core";
 
 const mockOverlayInstance = {
   setMap: vi.fn(),
@@ -32,8 +32,10 @@ const mockOverlayInstance = {
 };
 const mockGmRouteReplayOverlay = vi.fn(() => mockOverlayInstance);
 
-vi.mock("gm-route-replay-core", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("gm-route-replay-core")>();
+vi.mock("route-replay-googlemaps-core", async (importOriginal) => {
+  const actual = await importOriginal<
+    typeof import("route-replay-googlemaps-core")
+  >();
   return {
     ...actual,
     GmRouteReplayOverlay: mockGmRouteReplayOverlay,

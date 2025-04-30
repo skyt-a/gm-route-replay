@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { RouteReplay, RouteReplayHandle } from "gm-route-replay-react";
+import { RouteReplay, RouteReplayHandle } from "route-replay-googlemaps-react";
 import type {
   RoutePoint,
   RouteInput,
   CameraMode,
   PlayerEventMap,
-} from "gm-route-replay-core";
+} from "route-replay-googlemaps-core";
 import "./App.css";
 import { Loader } from "@googlemaps/js-api-loader";
 
@@ -100,7 +100,7 @@ function App() {
       .then((google) => {
         console.log("Google Maps API loaded (maps, geometry)");
         if (!mapInstance) {
-          console.log("Initializing Google Map instance...");
+          console.log("Initializing GoogleMaps instance...");
           const map = new google.Map(document.getElementById("map")!, {
             center: { lat: 35.68, lng: 139.76 },
             zoom: 15,
@@ -108,7 +108,7 @@ function App() {
             mapId: mapId,
           });
           setMapInstance(map);
-          console.log("Google Map instance created and set.");
+          console.log("GoogleMaps instance created and set.");
         }
       })
       .catch((e: unknown) => {

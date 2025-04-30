@@ -1,6 +1,6 @@
 # Core Library Example
 
-This page shows a basic usage example using the core `gm-route-replay-core` library directly, without React.
+This page shows a basic usage example using the core `route-replay-googlemaps-core` library directly, without React.
 
 ## HTML Setup
 
@@ -10,14 +10,14 @@ You'll need a basic HTML file to host the map and controls:
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Google Map Route Replay Core Example</title>
+    <title>GoogleMaps Route Replay Core Example</title>
     <style>
         #map { height: 400px; width: 100%; }
         button { margin: 5px; }
     </style>
 </head>
 <body>
-    <h1>Google Map Route Replay Core Example</h1>
+    <h1>GoogleMaps Route Replay Core Example</h1>
     <div id="map"></div>
     <div>
         <button id="playBtn">Play</button>
@@ -41,7 +41,7 @@ You'll need a basic HTML file to host the map and controls:
 Create a JavaScript file (e.g., `core-example.js`) to initialize the map and the player:
 
 ```javascript
-import { createPlayer } from 'gm-route-replay-core';
+import { createPlayer } from 'route-replay-googlemaps-core';
 
 let map;
 let player;

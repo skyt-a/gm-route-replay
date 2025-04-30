@@ -1,21 +1,21 @@
 **English** | [日本語](./README.ja.md)
 
-# Google Map Route Replay
+# GoogleMaps Route Replay
 
-[![Deploy VitePress Docs to GitHub Pages](https://github.com/skyt-a/gm-route-replay/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/skyt-a/gm-route-replay/actions/workflows/deploy-docs.yml)
+[![Deploy VitePress Docs to GitHub Pages](https://github.com/skyt-a/route-replay-googlemaps/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/skyt-a/route-replay-googlemaps/actions/workflows/deploy-docs.yml)
 
 A library for replaying route data with time information on Google Maps.
 It supports high-performance rendering using `WebGLOverlayView` and simultaneous playback of multiple tracks (moving entities).
 
 https://github.com/user-attachments/assets/c024a0e5-4d4a-43f5-88bc-e8c5e16e4110
 
-demo: https://gm-route-replay-react-vite.vercel.app/
+demo: https://route-replay-googlemaps-react-vite.vercel.app/
 
 ## Documentation
 
 For detailed API references and usage examples, please refer to the documentation site:
 
-**[Google Map Route Replay Documentation (English)](https://skyt-a.github.io/gm-route-replay/en/)**
+**[GoogleMaps Route Replay Documentation (English)](https://skyt-a.github.io/route-replay-googlemaps/en/)**
 
 ## Features
 
@@ -31,14 +31,14 @@ For detailed API references and usage examples, please refer to the documentatio
 
 ```bash
 # Core Library
-npm install gm-route-replay-core
-yarn add gm-route-replay-core
-pnpm add gm-route-replay-core
+npm install route-replay-googlemaps-core
+yarn add route-replay-googlemaps-core
+pnpm add route-replay-googlemaps-core
 
 # if using React
-npm install gm-route-replay-react
-yarn add gm-route-replay-react
-pnpm add gm-route-replay-react
+npm install route-replay-googlemaps-react
+yarn add route-replay-googlemaps-react
+pnpm add route-replay-googlemaps-react
 ```
 
 ## Basic Usage (React Component)
@@ -46,8 +46,8 @@ pnpm add gm-route-replay-react
 ```tsx
 import React, { useRef, useState, useEffect } from 'react';
 import { Loader } from "@googlemaps/js-api-loader";
-import { RouteReplay, RouteReplayHandle } from "gm-route-replay-react";
-import type { RouteInput } from 'gm-route-replay-core';
+import { RouteReplay, RouteReplayHandle } from "route-replay-googlemaps-react";
+import type { RouteInput } from 'route-replay-googlemaps-core';
 
 function MapComponent() {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
@@ -104,13 +104,13 @@ If you are not using React, you can use the core library directly.
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Google Map Route Replay Core Example</title>
+    <title>GoogleMaps Route Replay Core Example</title>
     <style>
         #map { height: 400px; width: 100%; }
     </style>
 </head>
 <body>
-    <h1>Google Map Route Replay Core Example</h1>
+    <h1>GoogleMaps Route Replay Core Example</h1>
     <div id="map"></div>
     <button id="playBtn">Play</button>
     <button id="pauseBtn">Pause</button>
@@ -123,7 +123,7 @@ If you are not using React, you can use the core library directly.
 ```
 
 ```javascript:core-example.js
-import { GmRouteReplayOverlay } from 'gm-route-replay-core';
+import { GmRouteReplayOverlay } from 'route-replay-googlemaps-core';
 
 let map;
 let replayOverlay;

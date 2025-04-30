@@ -1,17 +1,17 @@
-# gm-route-replay-core
+# route-replay-googlemaps-core
 
-Core playback logic for gm-route-replay.
+Core playback logic for route-replay-googlemaps.
 
-See the [main project documentation](https://skyt-a.github.io/gm-route-replay/ja/) for more details.
+See the [main project documentation](https://skyt-a.github.io/route-replay-googlemaps/ja/) for more details.
 
 ## Installation
 
 ```bash
-npm install gm-route-replay-core
+npm install route-replay-googlemaps-core
 # or
-yarn add gm-route-replay-core
+yarn add route-replay-googlemaps-core
 # or
-pnpm add gm-route-replay-core
+pnpm add route-replay-googlemaps-core
 ```
 
 ## License

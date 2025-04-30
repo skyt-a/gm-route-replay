@@ -4,8 +4,8 @@ import {
   GmRouteReplayOverlay,
   RouteInput,
   CameraMode,
-} from "gm-route-replay-core";
-import type { RoutePoint } from "gm-route-replay-core";
+} from "route-replay-googlemaps-core";
+import type { RoutePoint } from "route-replay-googlemaps-core";
 
 const mapDiv = document.getElementById("map") as HTMLDivElement;
 const playBtn = document.getElementById("playBtn") as HTMLButtonElement;
@@ -80,7 +80,9 @@ async function initialize() {
 
     statusDiv.textContent = "Initializing Route Replay...";
 
-    const { GmRouteReplayOverlay } = await import("gm-route-replay-core");
+    const { GmRouteReplayOverlay } = await import(
+      "route-replay-googlemaps-core"
+    );
 
     routeReplayOverlay = new GmRouteReplayOverlay({
       map: map,

@@ -7,8 +7,8 @@ Make sure you have a `.env` file in the `examples/react-vite` directory with you
 ```tsx
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
-import { RouteReplay, RouteReplayHandle } from "gm-route-replay-react";
-import type { RoutePoint, RouteInput, CameraMode, PlayerEventMap } from "gm-route-replay-core";
+import { RouteReplay, RouteReplayHandle } from "route-replay-googlemaps-react";
+import type { RoutePoint, RouteInput, CameraMode, PlayerEventMap } from "route-replay-googlemaps-core";
 import "./App.css";
 
 const createSquareRoute = (
@@ -227,7 +227,6 @@ function App() {
 
   return (
     <>
-      <h1>gm-route-replay React Example (Multi-Track)</h1>
       <div
         id="map"
         style={{ height: "500px", width: "100%" }}

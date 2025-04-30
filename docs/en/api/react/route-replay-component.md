@@ -3,8 +3,8 @@
 The main React component for displaying and controlling route replay.
 
 ```tsx
-import { RouteReplay, RouteReplayHandle } from 'gm-route-replay-react';
-import type { RouteInput, PlayerOptions, PlayerEventMap } from 'gm-route-replay-core';
+import { RouteReplay, RouteReplayHandle } from 'route-replay-googlemaps-react';
+import type { RouteInput, PlayerOptions, PlayerEventMap } from 'route-replay-googlemaps-core';
 import { useRef, useState, useEffect } from 'react';
 
 function MyComponent() {
@@ -51,7 +51,7 @@ The component accepts the following props:
 - **Type:** `google.maps.Map`
 - **Required:** `true`
 
-The Google Map instance to display the replay on.
+The GoogleMaps instance to display the replay on.
 
 ### `route`
 

@@ -1,26 +1,26 @@
-# gm-route-replay-react
+# route-replay-googlemaps-react
 
-React hook and components for gm-route-replay.
+React hook and components for route-replay-googlemaps.
 
-See the [main project documentation](https://skyt-a.github.io/gm-route-replay/ja/) for more details.
+See the [main project documentation](https://skyt-a.github.io/route-replay-googlemaps/ja/) for more details.
 
 ## Installation
 
 ```bash
-npm install gm-route-replay-react gm-route-replay-core react react-dom @types/google.maps
+npm install route-replay-googlemaps-react route-replay-googlemaps-core react react-dom @types/google.maps
 # or
-yarn add gm-route-replay-react gm-route-replay-core react react-dom @types/google.maps
+yarn add route-replay-googlemaps-react route-replay-googlemaps-core react react-dom @types/google.maps
 # or
-pnpm add gm-route-replay-react gm-route-replay-core react react-dom @types/google.maps
+pnpm add route-replay-googlemaps-react route-replay-googlemaps-core react react-dom @types/google.maps
 ```
 
 ## Usage
 
 ```tsx
-import { RouteReplay, RouteReplayHandle } from 'gm-route-replay-react';
+import { RouteReplay, RouteReplayHandle } from 'route-replay-googlemaps-react';
 import { useRef, useState, useEffect } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import type { RouteInput } from 'gm-route-replay-core';
+import type { RouteInput } from 'route-replay-googlemaps-core';
 
 function MyMapComponent() {
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);

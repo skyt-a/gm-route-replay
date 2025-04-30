@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.8",
-    "gm-route-replay-core": "workspace:*",
-    "gm-route-replay-react": "workspace:*",
+    "route-replay-googlemaps-core": "workspace:*",
+    "route-replay-googlemaps-react": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

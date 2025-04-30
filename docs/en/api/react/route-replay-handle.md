@@ -5,7 +5,7 @@ This allows imperative control of the replay player from the parent component.
 
 ```tsx
 import { useRef } from 'react';
-import { RouteReplay, RouteReplayHandle } from 'gm-route-replay-react';
+import { RouteReplay, RouteReplayHandle } from 'route-replay-googlemaps-react';
 
 function MyComponent() {
   const replayHandleRef = useRef<RouteReplayHandle>(null);
