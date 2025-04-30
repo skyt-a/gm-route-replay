@@ -1,3 +1,5 @@
+**English** | [日本語](./README.ja.md)
+
 # GM Route Replay
 
 [![Deploy VitePress Docs to GitHub Pages](https://github.com/skyt-a/gm-route-replay/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/skyt-a/gm-route-replay/actions/workflows/deploy-docs.yml)
@@ -12,8 +14,6 @@ https://github.com/user-attachments/assets/c024a0e5-4d4a-43f5-88bc-e8c5e16e4110
 For detailed API references and usage examples, please refer to the documentation site:
 
 **[GM Route Replay Documentation (English)](https://skyt-a.github.io/gm-route-replay/en/)**
-
-(日本語版は [こちら](./README.ja.md))
 
 ## Features
 
