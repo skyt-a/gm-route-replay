@@ -2,11 +2,11 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    globals: true, // describe, it などをグローバルに使えるようにする
-    environment: "jsdom", // DOM API を使うテストのため (OverlayView など)
-    setupFiles: ["./src/setupTests.ts"], // モックなどのセットアップファイル (後で作成)
+    globals: true,
+    environment: "jsdom",
+    setupFiles: ["./src/setupTests.ts"],
     coverage: {
-      provider: "v8", // or 'istanbul'
+      provider: "v8",
       reporter: ["text", "json", "html"],
     },
   },

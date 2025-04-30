@@ -1,7 +1,6 @@
 import type { IRenderer } from "./types";
 import type { PlayerOptions } from "../types";
 
-// MarkerOptions またはそれを返す関数
 type MarkerOptionsProvider =
   | google.maps.MarkerOptions
   | ((
@@ -12,12 +11,12 @@ type MarkerOptionsProvider =
 
 interface MarkerRendererOptions {
   map: google.maps.Map;
-  markerOptions?: MarkerOptionsProvider; // 型を変更
+  markerOptions?: MarkerOptionsProvider;
 }
 
 export class MarkerRenderer implements IRenderer {
   private map: google.maps.Map;
-  private markerOptionsProvider: MarkerOptionsProvider; // プロパティ名を変更
+  private markerOptionsProvider: MarkerOptionsProvider;
   private markers = new Map<string, google.maps.Marker>();
 
   private lastHeadings = new Map<string, number | undefined>();
@@ -25,20 +24,7 @@ export class MarkerRenderer implements IRenderer {
   constructor({ map, markerOptions }: MarkerRendererOptions) {
     this.map = map;
 
-    // オプションプロバイダーを保存
-    this.markerOptionsProvider = markerOptions || {}; // デフォルトは空オブジェクト
-
-    // baseMarkerOptions は使わない (またはデフォルト値のみ保持)
-    /*
-    this.baseMarkerOptions = {
-      clickable: false,
-      crossOnDrag: false,
-      ...(markerOptions || {}), // ここでのマージは単純にはできない
-      position: { lat: 0, lng: 0 },
-      map: null,
-    };
-    */
-    console.log("MarkerRenderer initialized (implements IRenderer).");
+    this.markerOptionsProvider = markerOptions || {};
   }
 
   mount(): void {
@@ -47,7 +33,6 @@ export class MarkerRenderer implements IRenderer {
         marker.setMap(this.map);
       }
     });
-    console.log("MarkerRenderer mounted (existing markers set to map).");
   }
 
   /**
@@ -73,7 +58,6 @@ export class MarkerRenderer implements IRenderer {
       return;
     }
 
-    // 現在のオプションを取得
     let currentMarkerOptions: google.maps.MarkerOptions;
     const baseDefaults = { clickable: false, crossOnDrag: false };
     if (typeof this.markerOptionsProvider === "function") {
@@ -90,16 +74,13 @@ export class MarkerRenderer implements IRenderer {
 
     if (!marker) {
       marker = new google.maps.Marker({
-        ...currentMarkerOptions, // 取得したオプションを使用
-        position: position, // position は updateMarker の引数で上書き
-        map: this.map, // map もここで設定
+        ...currentMarkerOptions,
+        position: position,
+        map: this.map,
       });
       this.markers.set(trackId, marker);
       console.log(`Marker created for track ${trackId}`);
     } else {
-      // 既存マーカーの更新時もオプションを適用 (setOptions があれば)
-      // marker.setOptions?.(currentMarkerOptions); // Markerモックに setOptions があれば
-
       const currentPos = marker.getPosition();
       if (
         !currentPos ||
@@ -120,7 +101,7 @@ export class MarkerRenderer implements IRenderer {
         });
       } else if (
         !icon &&
-        currentMarkerOptions.icon && // 修正: baseMarkerOptions -> currentMarkerOptions
+        currentMarkerOptions.icon &&
         typeof currentMarkerOptions.icon === "object" &&
         "path" in currentMarkerOptions.icon
       ) {

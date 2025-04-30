@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useImperativeHandle,
-  forwardRef,
-} from "react";
+import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 import {
   GmRouteReplayOverlay,
   PlayerOptions as CoreOptions,
@@ -52,7 +46,7 @@ export const RouteReplay = forwardRef<RouteReplayHandle, RouteReplayProps>(
       onSeek,
       onFinish,
       onError,
-      ...overlayOptions // Rest are options for the overlay constructor/setOptions
+      ...overlayOptions
     } = props;
 
     const overlayRef = useRef<GmRouteReplayOverlay | null>(null);

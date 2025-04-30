@@ -261,10 +261,10 @@ function App() {
             className="progress-bar"
             min="0"
             max="1"
-            step="0.001" // Smaller step for smoother seeking
+            step="0.001"
             value={progress}
-            onInput={handleSeekInput} // Handle dragging
-            onChange={handleSeekChange} // Handle mouse up / change commit
+            onInput={handleSeekInput}
+            onChange={handleSeekChange}
             disabled={!isReady}
           />
           <span className="time-display duration">
