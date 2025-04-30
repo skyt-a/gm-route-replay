@@ -8,8 +8,8 @@ The type definition for the route data that can be provided to the `route` prope
 import { RoutePoint } from './types';
 
 type RouteInput =
-  | RoutePoint[] // Single route
-  | { [trackId: string]: RoutePoint[] } // Multiple routes (Multi-track)
+  | RoutePoint[] 
+  | { [trackId: string]: RoutePoint[] } 
   | string;
 ```
 

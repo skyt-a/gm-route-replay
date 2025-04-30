@@ -8,8 +8,8 @@
 import { RoutePoint } from './types';
 
 type RouteInput =
-  | RoutePoint[] // 単一ルート
-  | { [trackId: string]: RoutePoint[] } // 複数ルート (Multi-track)
+  | RoutePoint[] 
+  | { [trackId: string]: RoutePoint[] } 
   | string;
 ```
 

@@ -23,14 +23,8 @@
         <button id="playBtn">再生</button>
         <button id="pauseBtn">一時停止</button>
         <button id="stopBtn">停止</button>
-        <!-- 必要に応じてシークバーや速度調整などのコントロールを追加 -->
     </div>
-
-    <!-- YOUR_GOOGLE_MAPS_API_KEY を置き換えてください -->
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap&libraries=geometry&v=weekly" defer></script>
-    
-    <!-- バンドルされた JavaScript ファイルを読み込みます -->
-    <!-- Vite, Webpack, esbuild などのバンドラでこの JS を処理するようにしてください -->
     <script type="module" src="./core-example.js"></script> 
 </body>
 </html>
@@ -52,7 +46,7 @@ function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 35.68, lng: 139.76 },
     zoom: 14,
-    mapId: 'YOUR_MAP_ID' // オプション: rendererType: 'webgl' を使う場合に必要
+    mapId: 'YOUR_MAP_ID' 
   });
 
 
@@ -60,37 +54,27 @@ function initMap() {
   const routeData = [
     { lat: 35.680, lng: 139.760, t: startTime },
     { lat: 35.680, lng: 139.770, t: startTime + 10000, heading: 90 },
-    { lat: 35.685, lng: 139.770, t: startTime + 20000, heading: 0 },  // 北へ
-    { lat: 35.685, lng: 139.760, t: startTime + 30000, heading: 270 },// 西へ
-    { lat: 35.680, lng: 139.760, t: startTime + 40000, heading: 180 },// 南へ (スタート地点に戻る)
+    { lat: 35.685, lng: 139.770, t: startTime + 20000, heading: 0 },  
+    { lat: 35.685, lng: 139.760, t: startTime + 30000, heading: 270 },
+    { lat: 35.680, lng: 139.760, t: startTime + 40000, heading: 180 },
   ];
-
-  console.log('プレイヤーを作成中...');
   try {
     player = createPlayer({
       map: map,
       route: routeData,
-      autoFit: true,          // ルートに合わせて自動で地図範囲を調整
-      initialSpeed: 1,        // 通常の再生速度
-
-
-      cameraMode: 'center',   // マーカーを中央に保つ
-      polylineOptions: {      // 軌跡を描画する
+      autoFit: true,          
+      initialSpeed: 1,        
+      cameraMode: 'center',   
+      polylineOptions: {      
         strokeColor: '#0000FF',
         strokeWeight: 3,
       },
-      markerOptions: {        // マーカーをカスタマイズ (オプション)
-
-      }
+      markerOptions: {/** */}
     });
-
 
     document.getElementById('playBtn')?.addEventListener('click', () => player?.play());
     document.getElementById('pauseBtn')?.addEventListener('click', () => player?.pause());
     document.getElementById('stopBtn')?.addEventListener('click', () => player?.stop());
-
-    console.log('プレイヤーが正常に作成されました:', player);
-
 
     player.on('frame', (payload) => {
 
